@@ -975,7 +975,7 @@ class JournalMonitor(threading.Thread):
                     update['game_mode_group'] = ''
                 update['target_faction_state'] = ''
                 update['old_target_faction_state'] = ''
-                update['advisor_init']: False
+                update['advisor_init'] = False
                 # credits start is always reset in a new session
                 log.debug('JournalMonitor setting initial credit value')
                 update['credits'] = data['Credits']
