@@ -225,7 +225,7 @@ def window_bgs(databroker, runtime):
     else:
         lb = Label(bgs_frame, text='Nothing to report yet.\n\nGo earn for the crew!', borderwidth=1, padx=10, pady=3)
         lb.grid(row=0, column=0, sticky=W, padx=3, pady=3)
-        bgs_canvas.config(height=64)
+        bgs_canvas.config(height=100)
 
 
 
