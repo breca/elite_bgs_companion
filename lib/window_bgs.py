@@ -5,6 +5,10 @@ from collections import defaultdict
 import datetime as dt
 import copy
 
+def onFrameConfigure(canvas):
+    '''Reset the scroll region to encompass the inner frame'''
+    canvas.configure(scrollregion=canvas.bbox("all"))
+
 # bgs report window
 def window_bgs(databroker, runtime):
     log.info('Opening BGS Stat window.')
@@ -12,9 +16,22 @@ def window_bgs(databroker, runtime):
     bgs_win.title('RSC: BGS Stats')
     bgs_win.iconbitmap(r'images\favicon.ico')
 
-    bgs_frame = ttk.Frame(bgs_win, padding="10 10 10 10")
+    # Create a canvas, then a frame embedded into the canvas. Attach a scrollbar to the canvas
+    # qv https://stackoverflow.com/questions/3085696/adding-a-scrollbar-to-a-group-of-widgets-in-tkinter
+    bgs_canvas = Canvas(bgs_win, width=600)
+
+    bgs_vsb = Scrollbar( bgs_win, orient="vertical", command=bgs_canvas.yview)
+    bgs_canvas.configure(yscrollcommand=bgs_vsb.set)
+
+    bgs_vsb.pack(side="right",fill="y")
+    bgs_canvas.pack(side="left", fill="both", expand=True)
+
+    bgs_frame = ttk.Frame(bgs_canvas, padding="10 10 10 10")
     bgs_frame.grid()
 
+    bgs_canvas.create_window((4,4), window=bgs_frame, anchor="nw")
+    bgs_frame.bind("<Configure>", lambda event, canvas=bgs_canvas: onFrameConfigure(bgs_canvas))
+    
     def bgs_empty(ids, databroker):
         log.debug('Attempting to empty BGS data.')
         databroker.remove_bgs(ids)
@@ -197,9 +214,18 @@ def window_bgs(databroker, runtime):
                         rows+=1
             clr_btn = Button(bgs_frame, text='Clear All and Exit', borderwidth=1, padx=10, pady=5, command=lambda: [bgs_empty(all_ids, databroker),bgs_win.destroy()])
             clr_btn.grid(row=rows+1, column=0, columnspan=9, padx=3, pady=3, sticky=S)
+
+            # Resize the main window to fit
+            # Rows are ~32px high including padding
+            # There's ~100px of fixed assets
+            bch = min(rows * 32 + 100, 800)
+            print ("rows,bch are %s,%s" % (rows,bch))
+            
+            bgs_canvas.config(height=bch)
     else:
         lb = Label(bgs_frame, text='Nothing to report yet.\n\nGo earn for the crew!', borderwidth=1, padx=10, pady=3)
         lb.grid(row=0, column=0, sticky=W, padx=3, pady=3)
+        bgs_canvas.config(height=64)
 
 
 
