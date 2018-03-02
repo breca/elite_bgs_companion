@@ -1159,16 +1159,13 @@ class JournalMonitor(threading.Thread):
                         log.debug('Found faction: ' + str(f))
                         if f['Faction'] not in ['Federation', 'Alliance', 'Empire']:
                             if len(f['Faction']) == 0:
-                                #print('thing')
                                 update['voucher']['factions'].append([runtime['station_faction'], f['Amount']])
                             else:
-                                #nice_amount = str('{:,}'.format(f['Amount']))
                                 update['voucher']['factions'].append([f['Faction'],f['Amount']])
                                 faction_no +=1
                 else:
                     update['voucher']['factions'].append([data['Faction'], data['Amount']])
                 update['voucher']['valid'] = self.valid_voucher(update['voucher'])
-                # runtime['credits']
 
             # filter missions out from donations
             elif event == 'MissionAccepted':
@@ -1179,32 +1176,27 @@ class JournalMonitor(threading.Thread):
                 else:
                     update['mission']['type'] = 'mission'
                     log.debug('JournalMonitor found type - ' + update['mission']['type'] + '.')
-                # update['mission']['timestamp'] = data['timestamp']
                 update['mission']['status'] = 'accepted'
                 update['mission']['mission_id'] = data['MissionID']
                 update['mission']['station_name'] = runtime['station_name']
                 update['mission']['influence'] = data['Influence']
                 update['mission']['faction'] = data['Faction']
-                # update['mission']['status'] = 'Accepted'
+                update['mission']['influence'] = data['Influence']
 
             elif event == 'MissionCompleted':
                 log.debug('JournalMonitor found ' + event + '.')
-                if data['Name'] == 'Mission_AltruismCredits_name':  #REVIEW double check this name is consistent
+                if data['Name'] == 'Mission_AltruismCredits_name':
                     update['mission']['type'] = 'donation'
                     log.debug('JournalMonitor found completing ' + update['mission']['type'] + ' mission.')
                 else:
                     update['mission']['type'] = 'mission'
                     log.debug('JournalMonitor found completing ' + update['mission']['type'] + '.')
                 update['mission']['mission_id'] = data['MissionID']
-                # update['mission']['timestamp'] = data['timestamp']
-                # update['mission']['type'] = 'mission'
-                # update['mission']['name'] = data['Name']
+
                 if 'Reward' in data.keys():
                     update['mission']['amount'] = data['Reward']
-                    #runtime['credits'] += update['mission']['amount']
                 elif 'Donation' in data.keys():
                     update['mission']['amount'] = data['Donation']
-                    #runtime['credits'] -= update['mission']['amount']
                 update['mission']['status'] = 'completed'
                 update['mission']['valid'] = self.valid_voucher(update['mission'])
 
