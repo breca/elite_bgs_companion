@@ -34,20 +34,22 @@ def window_options(root, config):
     opt_but_frame = ttk.Frame(win, padding="10 10 10 10")
     opt_but_frame.grid()
 
-    opt_button1 = Button(opt_but_frame, padx=20, command=lambda: set_options(config, eddn.get(), updates_on_start.get(), win), text='Change settings')
+    opt_button1 = Button(opt_but_frame, padx=20, command=lambda a={
+        'eddn': eddn,
+        'updates': updates_on_start
+        }: set_options(config, a, win), text='Change settings')
     opt_button1.grid(row=0,column=0, sticky=S)
 
     opt_button2 = Button(opt_but_frame, padx=20, command=win.destroy, text='Cancel')
     opt_button2.grid(row=0,column=2, sticky=S)
 
 
-def set_options(config, eddn, update, window):
+def set_options(config, a, window):
     log.info('Saving options...')
-    log.debug(str(eddn))
-    log.debug(str(update))
+    log.debug(str(a))
     try:
-        config.set('Options','EDDN_Enabled', str(eddn))
-        config.set('Options','Check_Updates_On_Start', str(update))
+        config.set('Options','EDDN_Enabled', str(a['eddn'].get()))
+        config.set('Options','Check_Updates_On_Start', str(a['updates'].get()))
         with open('settings.ini', 'w') as f:
             config.write(f)
         window.destroy()
