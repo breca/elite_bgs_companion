@@ -13,7 +13,7 @@ def onFrameConfigure(canvas):
 def window_bgs(databroker, runtime):
     log.info('Opening BGS Stat window.')
     bgs_win = Tk()
-    bgs_win.title('RSC: BGS Stats')
+    bgs_win.title('BGS Stats')
     bgs_win.iconbitmap(r'images\favicon.ico')
 
     # Create a canvas, then a frame embedded into the canvas. Attach a scrollbar to the canvas
@@ -223,7 +223,7 @@ def window_bgs(databroker, runtime):
             
             bgs_canvas.config(height=bch)
     else:
-        lb = Label(bgs_frame, text='Nothing to report yet.\n\nGo earn for the crew!', borderwidth=1, padx=10, pady=3)
+        lb = Label(bgs_frame, text='Nothing to report yet!', borderwidth=1, padx=10, pady=3)
         lb.grid(row=0, column=0, sticky=W, padx=3, pady=3)
         bgs_canvas.config(height=100)
 
