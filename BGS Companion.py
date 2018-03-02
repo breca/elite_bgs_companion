@@ -958,7 +958,7 @@ class JournalMonitor(threading.Thread):
             update = defaultdict(dict)
 
 
-            ''' ----- Misc. Statistical related stuff ----- '''
+            # ----- Misc. Statistical related stuff -----
 
             if event == 'LoadGame':
                 log.debug('JournalMonitor found ' + event + '.')
@@ -997,8 +997,7 @@ class JournalMonitor(threading.Thread):
                 update['ship_name'] = data['UserShipName']
                 update['ship'] = data['Ship']
 
-
-            ''' ----- Location related stuff ----- '''
+            # ----- Location related stuff -----
 
             elif event == 'Location':
                 log.debug('JournalMonitor found ' + event + '.')
@@ -1106,7 +1105,7 @@ class JournalMonitor(threading.Thread):
                 update['docked'] = False
 
 
-            ''' ----- SRV/Plantary related stuff ----- '''
+            # ----- SRV/Plantary related stuff -----
 
             elif event == 'ApproachBody':  # Going orbital
                 log.debug('JournalMonitor found ' + event + '.')
@@ -1145,8 +1144,7 @@ class JournalMonitor(threading.Thread):
                 if runtime['in_srv'] and data['PlayerControlled'] == 'true':
                     update['in_srv'] = False   # SRV death inferred here
 
-
-            ''' ----- BGS related stuff ----- '''
+            # ----- BGS related stuff -----
 
             elif event == 'RedeemVoucher':
                 log.debug('JournalMonitor found ' + event + '.')
