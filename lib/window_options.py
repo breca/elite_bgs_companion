@@ -22,12 +22,12 @@ def window_options(root, config):
 
     opt1 = Label(opt_frame, text='Upload system/station/market data to the Elite Dangerous Data Network', padx=0, pady=0, anchor=W, justify=LEFT)
     opt1.grid(row=1,column=1,sticky=W)
-    chk1 = Checkbutton(opt_frame, variable=eddn, command=lambda a=eddn: cb(a))
+    chk1 = Checkbutton(opt_frame, variable=eddn)
     chk1.grid(row=1, column=0)
 
     opt2 = Label(opt_frame, text='Automatically check for updates on startup', padx=0, pady=0, anchor=W, justify=LEFT)
     opt2.grid(row=2,column=1,sticky=W)
-    chk2 = Checkbutton(opt_frame, variable=updates_on_start, command=lambda a=updates_on_start: cb(a))
+    chk2 = Checkbutton(opt_frame, variable=updates_on_start)
     chk2.grid(row=2, column=0)
 
     # Buttons
@@ -58,9 +58,3 @@ def set_options(config, a, window):
         log.exception('Could not update settings.ini!', e)
         window.destroy()
         pass
-
-
-
-## test
-def cb(var):
-    print("variable is {}".format(var.get()))
