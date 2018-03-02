@@ -68,7 +68,7 @@ def main():
                'game_mode_group': '',
                'flight': '(Placeholder)',
                'flight_rank': '(Placeholder)',
-               'rsc_online': 0,
+               'player_faction_online': 0,
                'star_system': 'unknown',
                'system_is_target_faction_owned': False,
                'system_pop': '',
@@ -99,7 +99,7 @@ def main():
 
     # Create main window
     root = Tk()
-    root.title("RSC Companion")
+    root.title("BGS Companion")
     root.geometry("610x340")
     root.iconbitmap(r'images\favicon.ico')
     #root.wm_attributes('-transparentcolor','yellow')
@@ -154,7 +154,7 @@ def main():
 
     '''-----------------------------------------'''
 
-    # RSC image to left
+    # Faction image to left
     icon_image = ImageTk.PhotoImage(Image.open('images\logo_patch.png'))
     ic = Label(root, image=icon_image)
     ic.grid(column=0, row=0, rowspan=9, columnspan=2, sticky=N)
@@ -198,7 +198,7 @@ def main():
         'location': StringVar(),
         'credits': StringVar(),
         'creditDelta': StringVar(),
-        'rsc': StringVar(),
+        'player_faction_online': StringVar(),
         'gameMode': StringVar(),
         'advice': StringVar()
         }
@@ -340,7 +340,7 @@ def window_timezones():
     log.info('Opening timezone window.')
     win = Tk()
     win.iconbitmap(r'images\favicon.ico')
-    win.title('RSC: Timezones')
+    win.title('Timezones')
     tz_frame = ttk.Frame(win, padding="5 5 5 20")
     tz_frame.grid()
 
