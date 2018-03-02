@@ -957,7 +957,9 @@ class JournalMonitor(threading.Thread):
             event = data['event']
             update = defaultdict(dict)
 
-            # Location related stuff
+
+            ''' ----- Misc. Statistical related stuff ----- '''
+
             if event == 'LoadGame':
                 log.debug('JournalMonitor found ' + event + '.')
                 if not runtime['stats_set']:
@@ -969,6 +971,7 @@ class JournalMonitor(threading.Thread):
                 update['ship'] = data['Ship']  #FerDeLance, etc
                 update['game_mode'] = data['GameMode'] #Group/Open/Solo
 
+                # Capture which private group you're in
                 if update['game_mode'] == 'Group':
                     update['game_mode_group'] = data['Group']
                 else:
@@ -979,6 +982,23 @@ class JournalMonitor(threading.Thread):
                 # credits start is always reset in a new session
                 log.debug('JournalMonitor setting initial credit value')
                 update['credits'] = data['Credits']
+
+            elif event == 'Loadout':
+                log.debug('JournalMonitor found ' + event + '.')
+                update['ship_name'] = data['ShipName']
+                update['ship'] = data['Ship']
+
+            elif event == 'RefuelAll' or event == 'RefuelPartial':
+                log.debug('JournalMonitor found ' + event + '.')
+                update['low_fuel'] = False
+
+            elif event == 'UserShipName':
+                log.debug('JournalMonitor found ' + event + '.')
+                update['ship_name'] = data['UserShipName']
+                update['ship'] = data['Ship']
+
+
+            ''' ----- Location related stuff ----- '''
 
             elif event == 'Location':
                 log.debug('JournalMonitor found ' + event + '.')
@@ -1026,46 +1046,10 @@ class JournalMonitor(threading.Thread):
                 except:
                     update['supercruise'] = True
                     pass
-                #REVIEW event SupercruiseEntry
-#{'timestamp': '2018-01-16T00:40:38Z', 'event': 'SupercruiseEntry', 'StarSystem': 'Deciat'}
-            elif event == 'FSDJump':
+
+            elif event == 'SupercruiseEntry':
                 log.debug('JournalMonitor found ' + event + '.')
-                update['star_system'] = data['StarSystem']
-                update['target_faction_state'] = self.state_finder(data)
-                update['system_pop'] = data['Population']
-                if 'Body' in data.keys():  #REVIEW may not be needed
-                        log.debug('JournalMonitor found near body:' + data['Body'] + '.')
-                        update['near_body'] = data['Body']
-                else:
-                    log.debug('JournalMonitor cleared near_body, near_body_type, station_name.')
-                    update['near_body'] = ''
-                    update['near_body_type'] = ''
-                    update['station_name'] = ''
-                    pass
                 update['supercruise'] = True
-
-            elif event == 'ApproachSettlement':
-                log.debug('JournalMonitor found ' + event + '.')
-                update['station_name'] = data['Name']  # Palmer Exchange ++
-
-            elif event == 'LaunchSRV':
-                log.debug('JournalMonitor found ' + event + '.')
-                update['in_srv'] = True
-
-            elif event == 'DockSRV':
-                log.debug('JournalMonitor found ' + event + '.')
-                update['in_srv'] = False
-
-            elif event == 'Loadout':
-                log.debug('JournalMonitor found ' + event + '.')
-                update['ship_name'] = data['ShipName']
-                update['ship'] = data['Ship']
-                update['in_srv'] = False # SRV death inferred here
-
-            elif event == 'UserShipName':
-                log.debug('JournalMonitor found ' + event + '.')
-                update['ship_name'] = data['UserShipName']
-                update['ship'] = data['Ship']
 
             elif event == 'SupercruiseExit':
                 log.debug('JournalMonitor found ' + event + '.')
@@ -1082,21 +1066,22 @@ class JournalMonitor(threading.Thread):
                     elif data['near_body_type'] == 'Null':
                         update['near_body_type'] == ''
 
-
-                #if update['near_body_type'] == 'Planet' and update['near_body'].starts_with(update['star_system']):
-                #REVIEW potentially room to capture suborbital flight, coupled with station_name...
-#{'timestamp': '2018-01-16T00:26:56Z', 'event': 'SupercruiseExit', 'StarSystem': 'Deciat', 'Body': 'Deciat 6 a', 'BodyType': 'Planet'}
-
-            elif event == 'Touchdown':
+            elif event == 'FSDJump':
                 log.debug('JournalMonitor found ' + event + '.')
-                update['landed'] = True
-
-            elif event == 'Liftoff':
-                log.debug('JournalMonitor found ' + event + '.')
-                update['landed'] = False
-                if runtime['in_srv'] and data['PlayerControlled'] == 'true':
-                    update['in_srv'] = False   # SRV death inferred here
-
+                update['star_system'] = data['StarSystem']
+                update['target_faction_state'] = self.state_finder(data)
+                update['system_pop'] = data['Population']
+                update['fuel']  = data['FuelLevel']  # "FuelLevel":12.872868 #REVIEW need to find how this is actually expressed (tonnes/percentage)
+                if 'Body' in data.keys():  #REVIEW may not be needed
+                        log.debug('JournalMonitor found near body:' + data['Body'] + '.')
+                        update['near_body'] = data['Body']
+                else:
+                    log.debug('JournalMonitor cleared near_body, near_body_type, station_name.')
+                    update['near_body'] = ''
+                    update['near_body_type'] = ''
+                    update['station_name'] = ''
+                    pass
+                update['supercruise'] = True
 
             elif event == 'Docked':
                 log.debug('JournalMonitor found ' + event + '.')
@@ -1120,13 +1105,53 @@ class JournalMonitor(threading.Thread):
                 log.debug('JournalMonitor cleared station_faction.')
                 update['docked'] = False
 
-                '''-----------------------------------------'''
+
+            ''' ----- SRV/Plantary related stuff ----- '''
+
+            elif event == 'ApproachBody':  # Going orbital
+                log.debug('JournalMonitor found ' + event + '.')
+                update['orbital'] = True
+                update['near_body'] = data['Body']  # Eranin 2
+
+            elif event == 'LeaveBody':  # Leaving orbital
+                log.debug('JournalMonitor found ' + event + '.')
+                update['orbital'] = False
+                update['near_body'] = ''
+
+            elif event == 'ApproachSettlement':
+                log.debug('JournalMonitor found ' + event + '.')
+                update['station_name'] = data['Name']  # Palmer Exchange ++
+
+            elif event == 'LaunchSRV':
+                log.debug('JournalMonitor found ' + event + '.')
+                update['in_srv'] = True
+
+            elif event == 'DockSRV':
+                log.debug('JournalMonitor found ' + event + '.')
+                update['in_srv'] = False
+
+            elif event == 'SRVDestroyed':
+                log.debug('JournalMonitor found ' + event + '.')
+                update['in_srv'] = False
+                update['in_ship'] = True
+
+            elif event == 'Touchdown':
+                log.debug('JournalMonitor found ' + event + '.')
+                update['landed'] = True
+
+            elif event == 'Liftoff':
+                log.debug('JournalMonitor found ' + event + '.')
+                update['landed'] = False
+                if runtime['in_srv'] and data['PlayerControlled'] == 'true':
+                    update['in_srv'] = False   # SRV death inferred here
+
+
+            ''' ----- BGS related stuff ----- '''
 
             elif event == 'RedeemVoucher':
                 log.debug('JournalMonitor found ' + event + '.')
                 update['voucher']['timestamp'] = data['timestamp']
                 update['voucher']['type'] = data['Type']   # scannable / bounty / CombatBond
-                # update['voucher']['amount'] = data['Amount']
                 update['voucher']['factions'] = [] # make list
                 faction_no =0
                 if 'Factions' in data.keys():
