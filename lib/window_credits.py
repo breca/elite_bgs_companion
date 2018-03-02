@@ -3,8 +3,9 @@ from tkinter import *
 from tkinter import ttk
 
 # credits window
-def window_credits():
-    win = Tk()
+def window_credits(root):
+    win = Toplevel(root)
+    win.geometry("+%d+%d" % (root.winfo_rootx(), root.winfo_rooty()))
     win.iconbitmap(r'images\favicon.ico')
     win.title('Credits')
     cred_frame = ttk.Frame(win, padding="3 3 3 3")

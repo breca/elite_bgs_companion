@@ -3,8 +3,9 @@ from tkinter import *
 from tkinter import ttk
 
 # feature request window
-def window_feature_req():
-    win = Tk()
+def window_feature_req(root):
+    win = Toplevel(root)
+    win.geometry("+%d+%d" % (root.winfo_rootx(), root.winfo_rooty()))
     win.iconbitmap(r'images\favicon.ico')
     win.title('RSC: Feature request')
     req_frame = ttk.Frame(win, padding="20 20 20 20")

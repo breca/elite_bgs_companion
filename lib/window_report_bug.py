@@ -3,8 +3,9 @@ from tkinter import *
 from tkinter import ttk
 
 # bug report window
-def window_report_bug():
-    win = Tk()
+def window_report_bug(root):
+    win = Toplevel(root)
+    win.geometry("+%d+%d" % (root.winfo_rootx(), root.winfo_rooty()))
     win.iconbitmap(r'images\favicon.ico')
     win.title('RSC: Report a bug')
     bug_frame = ttk.Frame(win, padding="3 3 3 3")
