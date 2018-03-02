@@ -1,8 +1,8 @@
 from . import log
 import sqlite3
 from collections import defaultdict
-
-
+from os import remove as careful_delete
+from os import path
 
 # connect to db
 class DatabaseAgent():
@@ -39,24 +39,33 @@ class DatabaseAgent():
             log.info('Checking database setup.')
             sql = 'SELECT sql FROM sqlite_master '
             self.cursor.execute(sql)
-            result = self.cursor.fetchall()[0]
+            result = self.cursor.fetchall()
             log.debug('DB Setup check returned: ' + str(result))
             if len(result) == 0:
                 self.setup()
             else:
                 # If there are indeed databases, make sure the schema is up to snuff
-                sql = '''select * from schema'''
-                self.cursor.execute(sql)
-                schema_check = self.cursor.fetchall()[0]
+                schema_file = path.isfile('schema.dat')
+                if schema_file:
+                    with open('schema.dat', 'r') as f:
+                        saved = f.readlines()
+                        schema_check = eval(saved[0])
+                else:
+                    schema_check = 'Missing'
+
                 if result != schema_check:
-                    log.info('Old database found. Recreating database.')
+                    log.info('Recreating database.')
                     log.debug('Old schema was:\n{}\nNew schema:\n{}'.format(result, schema_check))
-                    for i in 'voucher', 'mission', 'session', 'schema':
+                    for i in 'voucher', 'mission', 'session':
                         log.debug('Dropping table {}'.format(i))
                         sql = 'drop table {}'.format(i)
                         self.cursor.execute(sql)
                         self.conn.commit()
+                    if schema_file != 'Missing':
+                        careful_delete('schema.dat')
                     self.setup()
+                else:
+                    log.info('Database OK.')
         except Exception as e:
             log.exception('Exception occured checking database setup.', e)
             pass
@@ -77,18 +86,13 @@ class DatabaseAgent():
             sql = '''CREATE TABLE IF NOT EXISTS session (journal_file text, journal_byte_offset int, commander_name text, credits int, ship_name text, ship text, game_mode text, game_mode_group text, star_system text, system_is_target_faction_owned text, system_pop int, near_body text, near_body_type text, docked text, landed text, station_name text, station_faction text, target_faction_state text, old_target_faction_state text, location text, in_srv text)'''
             self.cursor.execute(sql)
             self.conn.commit()
-            log.info('Session data table created.')
-            sql = '''CREATE TABLE IF NOT EXISTS schema (schema text)'''
-            self.cursor.execute(sql)
-            self.conn.commit()
+            log.info('Companion session table created.')
             # Backup our current schema for version checks
             sql = 'SELECT sql FROM sqlite_master'
             self.cursor.execute(sql)
-            result = self.cursor.fetchall()[0]
-            sql = 'insert into schema values ("{}")'.format(result)
-            self.cursor.execute(sql)
-            self.conn.commit()
-            log.info('Schema table created and saved.')
+            result = self.cursor.fetchall()
+            with open('schema.dat', 'w') as f:
+                f.write(str(result))
             self.check_setup()
         except Exception as e:
             log.exception('Exception occured during table creation.', e)
