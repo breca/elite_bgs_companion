@@ -40,6 +40,7 @@ from lib.window_bgs import window_bgs
 from lib.window_credits import window_credits
 from lib.window_feature_req import window_feature_req
 from lib.window_report_bug import window_report_bug
+from lib.window_options import window_options
 from lib.advisor import advisor
 from lib import links
 from lib import version_checker
@@ -135,21 +136,27 @@ def main():
     #menu_help = Menu(menu_bar,tearoff=0)
 
     # 'About' menu
-    menu_about = Menu(menu_bar,tearoff=0)
-    menu_about.add_command(label="Request a feature", command=window_feature_req)
-    menu_about.add_command(label="Report a bug", command=window_report_bug)
-    menu_about.add_command(label="Credits", command=window_credits)
+    menu_main = Menu(menu_bar,tearoff=0)
+
+    menu_main.add_command(label="Settings", command=lambda: window_options(root, config))
+    menu_main.add_command(label="Check for updates", command=lambda: check_version(msg_queue, config, True))
+    menu_main.add_separator()
+    menu_main.add_command(label="Request a feature", command=lambda: window_feature_req(root))
+    menu_main.add_command(label="Report a bug", command=lambda: window_report_bug(root))
+    menu_main.add_separator()
+    menu_main.add_command(label="Credits", command=lambda: window_credits(root))
+    menu_main.add_separator()
+    menu_main.add_command(label="Exit", command=lambda: graceful_close(root, monitor_data, monitor_status, monitor_journal))
 
     # Add menus to menu bar
-    #menu_bar.add_cascade(label="Menu", menu=menu_file)
+    menu_bar.add_cascade(label="Menu", menu=menu_main)
     menu_bar.add_command(label="Hear the Signal", command=links.listen)
     menu_bar.add_command(label="Timezones", command=window_timezones)
     menu_bar.add_command(label="Buy Skins", command=links.skin)
     menu_bar.add_command(label="Donate", command=links.donate)
-    menu_bar.add_cascade(label="About", menu=menu_about)
-    menu_bar.add_command(label="Check for updates", command=lambda: check_version(msg_queue, config, True))
+
     #menu_bar.add_cascade(label="About", menu=menu_about)
-    menu_bar.add_command(label="Exit", command=lambda: graceful_close(root, monitor_data, monitor_status, monitor_journal))
+
 
 
     '''-----------------------------------------'''
@@ -297,7 +304,7 @@ def main():
     buttons_frame.grid(sticky="N,E,S,W")
     buttons_frame.rowconfigure(0)#, weight=2)
     buttons_frame.place(y=230,x=510)#relx=0.32)
-    button_view_bgs = ttk.Button(buttons_frame, text='View BGS Stats', command=lambda: window_bgs(monitor_data, runtime))
+    button_view_bgs = ttk.Button(buttons_frame, text='View BGS Stats', command=lambda: window_bgs(root, monitor_data, runtime))
     button_view_bgs.grid(column=1, row=3)
 
     '''###########################################
