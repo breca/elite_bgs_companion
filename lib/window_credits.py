@@ -6,7 +6,7 @@ from tkinter import ttk
 def window_credits():
     win = Tk()
     win.iconbitmap(r'images\favicon.ico')
-    win.title('RSC: Credits')
+    win.title('Credits')
     cred_frame = ttk.Frame(win, padding="3 3 3 3")
     cred_frame.grid()
 
