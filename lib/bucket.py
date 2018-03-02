@@ -9,9 +9,9 @@ If you can, please do the following:
 
 Step 1: Process any BGS data that actually worked because we're going to delete your database.
 Step 2: Close the companion.
-Step 3: Edit the 'settings.ini' in your RSC Companion directory and change the LogLevel to 'debug' (without quotes)
-Step 4: Remove the 'companion.db' file under 'etc' in your RSC Companion directory.
-Step 5: Re-run the RSC companion - it will play back over the journal file, hopefully reproducing the issue, creating a nice big fat log.
+Step 3: Edit the 'settings.ini' in your Companion directory and change the LogLevel to 'debug' (without quotes)
+Step 4: Remove the 'companion.db' file under 'etc' in your Companion directory.
+Step 5: Re-run the companion - it will play back over the journal file, hopefully reproducing the issue, creating a nice big fat log.
 
 When it's done..
 
@@ -20,7 +20,7 @@ Send Kalis a PM on discord, including:
 * Your OS, OS version (i.e Windows 10)
 * Details of what happened / How to reproduce the bug
 
-..attach the 'companion.log' file in your RSC Companion directory to your report.
+..attach the 'companion.log' file in your Companion directory to your report.
 
 Don't forget to change the 'settings.ini' back to 'info' as debug mode can get pretty spammy. And weird things happen.
 
@@ -37,10 +37,12 @@ Hit up Kalis on discord.
 credtext = '''
 Cobbled together in a drunken haze by CMDR Kalis for Radio Sidewinder.
 
-Thanks to CMDR Azrael Nixx, CMDR R.Sharpe for being willing test bunnies.
 Special thanks to:
+CMDR Yojimbosan for code contributions, 9th dan black belt bug
+reporting-fu and hosting.
 CMDR Choopsha for thorough testing and feedback from inception.
-CMDR Yojimbosan for 9th dan black belt bug reporting-fu and hosting.
+
+Thanks to CMDR Azrael Nixx, CMDR R.Sharpe for being willing test bunnies.
 
 And of course, thanks to Black Bart for establishing an awesome community,
 finding the signal and sharing it with everyone.
@@ -130,5 +132,6 @@ flavour_investment = flavour_expansion
 advisor_lockdown = ' is in lockdown here!\nRedeem combat bounties here to help lift the lockdown. '
 flavour_lockdown = ['\nI can\'t even use the mission computer here.',
                     '\nYour faction needs you!',
-                    '\nI hope this is just paranoia.'
+                    '\nI hope this is just paranoia.',
+                    '\nPerhaps someone just lost their keys?'
                     ]
