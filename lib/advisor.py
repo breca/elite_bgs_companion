@@ -2,7 +2,7 @@ from . import bucket
 from . import log
 import random
 
-def advisor(runtime):  ## Expand this with
+def advisor(runtime):
         data = "I've got nothing."
         if runtime['target_faction_state'] in ['War', 'CivilWar']:
             log.debug('Showing advisor text for War, CivilWar')
@@ -35,11 +35,3 @@ def advisor(runtime):  ## Expand this with
             log.debug('Showing advisor text for Lockdown')
             data = runtime['target_faction'] + bucket.advisor_lockdown + random.choice(bucket.flavour_lockdown)
         return data
-
-
-# copy text from window into clipboard
-def copy_to_clipboard(win, data):
-    win.clipboard_clear()
-    win.clipboard_append(data)
-    win.update()
-    log.debug('Copied data from window "{}" to clipboard.'.format(str(win), data))
