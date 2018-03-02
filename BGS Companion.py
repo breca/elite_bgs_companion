@@ -1283,6 +1283,7 @@ class JournalMonitor(threading.Thread):
 
         if event['type'] == 'bounty' or event['type'] == 'CombatBond':
             if state in ['Elections', 'Famine', 'Outbreak']: #REVIEW confirm Elections type
+                reason = 'Redeemed Combat Bond for faction in state: {}'.format(state)
                 will_effect_influence = False
             elif state in ['Lockdown', 'CivilUnrest']:    #REVIEW confirm CivilUnrest type
                 will_decrease_duration = True
@@ -1291,6 +1292,7 @@ class JournalMonitor(threading.Thread):
 
         if event['type'] == 'mission' or event['type'] == 'donation':   #REVIEW FIXME combat missions count here
             if state in ['War', 'Civil War', 'Famine', 'Outbreak', 'Lockdown']:
+                reason = 'Mission completed for faction in state: {}'.format(state)
                 will_effect_influence = False
             else:
                 will_effect_influence = True
@@ -1301,6 +1303,7 @@ class JournalMonitor(threading.Thread):
             elif state in ['Bust', 'Famine', 'Outbreak']:
                 will_decrease_duration = True
             elif state in ['War', 'CivilWar']:
+                reason = 'Redeemed exploration data for faction in state: {}'.format(state)
                 will_effect_influence = False
             else:
                 will_effect_influence = True
@@ -1321,10 +1324,12 @@ class JournalMonitor(threading.Thread):
                     if commodity in medicine_commodities:
                         will_decrease_duration = True
                 elif state in ['War', 'CivilWar', 'Lockdown']:
+                    reason = 'Conducted normal trade for faction in state: {}'.format(state)
                     will_effect_influence = False
                 else:
                     will_effect_influence = True
             else:
+                reason = 'Failed to make a profit'
                 will_effect_influence = False
 
         if event['type'] == 'smuggled':
@@ -1343,6 +1348,7 @@ class JournalMonitor(threading.Thread):
                 else:
                     will_effect_influence = True
             else:
+                reason = 'Failed to make a profit'
                 will_effect_influence = False
 
         if will_increase_duration:
@@ -1353,6 +1359,7 @@ class JournalMonitor(threading.Thread):
             result = 'decrease'
         elif not will_effect_influence:
             log.info('Determined this voucher is invalid (will not effect influence).')
+            log.info('Reason: {}'.format(reason))
             result = 'invalid'
         else:
             log.info('Determined this voucher is valid.')
