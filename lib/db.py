@@ -37,12 +37,26 @@ class DatabaseAgent():
     def check_setup(self):
         try:
             log.info('Checking database setup.')
-            sql = 'SELECT sql FROM sqlite_master '#FIXME make this a bit more robust
+            sql = 'SELECT sql FROM sqlite_master '
             self.cursor.execute(sql)
-            result = self.cursor.fetchall()
+            result = self.cursor.fetchall()[0]
             log.debug('DB Setup check returned: ' + str(result))
             if len(result) == 0:
                 self.setup()
+            else:
+                # If there are indeed databases, make sure the schema is up to snuff
+                sql = '''select * from schema'''
+                self.cursor.execute(sql)
+                schema_check = self.cursor.fetchall()[0]
+                if result != schema_check:
+                    log.info('Old database found. Recreating database.')
+                    log.debug('Old schema was:\n{}\nNew schema:\n{}'.format(result, schema_check))
+                    for i in 'voucher', 'mission', 'session', 'schema':
+                        log.debug('Dropping table {}'.format(i))
+                        sql = 'drop table {}'.format(i)
+                        self.cursor.execute(sql)
+                        self.conn.commit()
+                    self.setup()
         except Exception as e:
             log.exception('Exception occured checking database setup.', e)
             pass
@@ -56,7 +70,7 @@ class DatabaseAgent():
             self.cursor.execute(sql)
             self.conn.commit()
             log.info('BGS voucher table created.')
-            sql = '''CREATE TABLE IF NOT EXISTS mission (mission_id int unique default(0), mission_type text, mission_giver_system text, mission_giver_station text, mission_giver_faction text, mission_amount int default 0, mission_state text default 'accepted', processed text default 'False')'''
+            sql = '''CREATE TABLE IF NOT EXISTS mission (mission_id int unique default(0), mission_type text, mission_influence text, mission_giver_system text, mission_giver_station text, mission_giver_faction text, mission_amount int default 0, mission_state text default 'accepted', processed text default 'False')'''
             self.cursor.execute(sql)
             self.conn.commit()
             log.info('BGS mission table created.')
@@ -64,6 +78,17 @@ class DatabaseAgent():
             self.cursor.execute(sql)
             self.conn.commit()
             log.info('Session data table created.')
+            sql = '''CREATE TABLE IF NOT EXISTS schema (schema text)'''
+            self.cursor.execute(sql)
+            self.conn.commit()
+            # Backup our current schema for version checks
+            sql = 'SELECT sql FROM sqlite_master'
+            self.cursor.execute(sql)
+            result = self.cursor.fetchall()[0]
+            sql = 'insert into schema values ("{}")'.format(result)
+            self.cursor.execute(sql)
+            self.conn.commit()
+            log.info('Schema table created and saved.')
             self.check_setup()
         except Exception as e:
             log.exception('Exception occured during table creation.', e)
@@ -159,9 +184,10 @@ class DatabaseAgent():
             if not update['mission']['faction']:
                 raise ValueError('Update was:\n' + str(update) + '\nRuntime:\n' + str(runtime))
             log.info('Attempting to insert mission [{}] into BGS mission table.'.format(update['mission']['mission_id']))
-            sql = '''insert or ignore into mission values ("{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}")'''.format(
+            sql = '''insert or ignore into mission values ("{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}")'''.format(
                 update['mission']['mission_id'],
                 update['mission']['type'],
+                update['mission']['influence'],
                 runtime['star_system'],
                 runtime['station_name'],
                 update['mission']['faction'],
@@ -187,7 +213,7 @@ class DatabaseAgent():
     # return mission facts
     def lookup_mission(self, m_id):
         log.info('Fetching mission [{}] facts from database.'.format(m_id))
-        sql = 'select mission_giver_system, mission_giver_station, mission_giver_faction from mission where mission_id is "{}"'.format(m_id)
+        sql = 'select mission_giver_system, mission_giver_station, mission_giver_faction, mission_influence from mission where mission_id is "{}"'.format(m_id)
         self.cursor.execute(sql)
         res = self.cursor.fetchall()
         try:
@@ -195,6 +221,7 @@ class DatabaseAgent():
             a = res[0]['mission_giver_system']
             b = res[0]['mission_giver_station']
             c = res[0]['mission_giver_faction']
+            d = res[0]['mission_influence']
             return a, b, c
         except Exception as e:
             log.warning('Could not find mission ' + str(m_id) +'! May be already processed.')
