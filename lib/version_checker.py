@@ -92,6 +92,7 @@ def skip_update(new_version, config, window):
     except Exception as e:
         log.exception('Could not update settings.ini!', e)
         window.destroy()
+        pass
 
 
 
