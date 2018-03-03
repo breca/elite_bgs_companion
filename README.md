@@ -1,6 +1,6 @@
 # BGS Companion for Elite: Dangerous
 
-![Example build](https://i.imgur.com/cpI2vzF.jpg)
+!(https://i.imgur.com/vSCppvA.png)
 
 ## Current Version: 0.81a
 
