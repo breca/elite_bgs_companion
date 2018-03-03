@@ -219,7 +219,6 @@ def window_bgs(databroker, runtime):
             # Rows are ~32px high including padding
             # There's ~100px of fixed assets
             bch = min(rows * 32 + 100, 800)
-            print ("rows,bch are %s,%s" % (rows,bch))
             
             bgs_canvas.config(height=bch)
     else:
