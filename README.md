@@ -1,6 +1,7 @@
 # BGS Companion for Elite: Dangerous
 
 ![Example Build](https://i.imgur.com/vSCppvA.png)
+
 ![Carte Blanc Edition](https://i.imgur.com/cpI2vzF.png)
 
 ## Current Version: 0.81a
