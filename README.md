@@ -1,6 +1,6 @@
 # BGS Companion for Elite: Dangerous
 
-!(https://i.imgur.com/vSCppvA.png)
+![](https://i.imgur.com/vSCppvA.png)
 
 ## Current Version: 0.81a
 
