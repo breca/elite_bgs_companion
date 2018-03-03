@@ -1,4 +1,7 @@
 # BGS Companion for Elite: Dangerous
+
+![Example build](https://i.imgur.com/cpI2vzF.jpg)
+
 ## Current Version: 0.81a
 
 This application parses the player's journal file and extracts
