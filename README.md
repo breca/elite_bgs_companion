@@ -1,5 +1,10 @@
 # BGS Companion for Elite: Dangerous
-## Current Version: 0.81a
+
+![Example Build](https://i.imgur.com/vSCppvA.png)
+
+![Carte Blanc Edition](https://i.imgur.com/cpI2vzF.png)
+
+## Current Version: 0.9a
 
 This application parses the player's journal file and extracts
 information that pertains to the Elite Dangerous background simulation.
