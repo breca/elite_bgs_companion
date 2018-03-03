@@ -10,9 +10,10 @@ def onFrameConfigure(canvas):
     canvas.configure(scrollregion=canvas.bbox("all"))
 
 # bgs report window
-def window_bgs(databroker, runtime):
+def window_bgs(root, databroker, runtime):
     log.info('Opening BGS Stat window.')
-    bgs_win = Tk()
+    bgs_win = Toplevel(root)
+    bgs_win.geometry("+%d+%d" % (root.winfo_rootx(), root.winfo_rooty()))
     bgs_win.title('BGS Stats')
     bgs_win.iconbitmap(r'images\favicon.ico')
 
@@ -31,7 +32,7 @@ def window_bgs(databroker, runtime):
 
     bgs_canvas.create_window((4,4), window=bgs_frame, anchor="nw")
     bgs_frame.bind("<Configure>", lambda event, canvas=bgs_canvas: onFrameConfigure(bgs_canvas))
-    
+
     def bgs_empty(ids, databroker):
         log.debug('Attempting to empty BGS data.')
         databroker.remove_bgs(ids)
@@ -219,7 +220,7 @@ def window_bgs(databroker, runtime):
             # Rows are ~32px high including padding
             # There's ~100px of fixed assets
             bch = min(rows * 32 + 100, 800)
-            
+
             bgs_canvas.config(height=bch)
     else:
         lb = Label(bgs_frame, text='Nothing to report yet!', borderwidth=1, padx=10, pady=3)

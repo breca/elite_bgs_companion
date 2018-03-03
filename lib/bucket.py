@@ -39,15 +39,10 @@ Cobbled together in a drunken haze by CMDR Kalis for Radio Sidewinder.
 
 Special thanks to:
 CMDR Yojimbosan for code contributions, 9th dan black belt bug
-reporting-fu and hosting.
+reporting-fu.
 CMDR Choopsha for thorough testing and feedback from inception.
 
 Thanks to CMDR Azrael Nixx, CMDR R.Sharpe for being willing test bunnies.
-
-And of course, thanks to Black Bart for establishing an awesome community,
-finding the signal and sharing it with everyone.
-
-And thanks to you, dear crew member, for helping make Radio Sidewinder great.
 '''
 
 advisor_famine = ' is experiencing a famine!\nTrade/Smuggle Food and supply exploration data to help out.'
@@ -88,7 +83,6 @@ flavour_war = ['\nIf you\'re not here to win it, you\'re in the wrong place.',
                '\nI love the smell of hydrogen fuel in the morning.',
                '\nShow me your war face!',
                '\nYour faction needs you!',
-               '\nSignal save us all.',
                '\nI want YOU\nfor the RSC Navy!',
                '\nLet me hear your battle cry!',
                '\nWhat are you waiting for? Those medals don\'t earn themselves.'
@@ -98,7 +92,6 @@ advisor_outbreak = ' is having an outbreak in this system!\nTrade/Smuggle Medici
 flavour_outbreak = ['\n*cough*',
                     '\n*wheeze*',
                     '\nCould I get a tissue as well?',
-                    '\nSignal protect us.',
                     '\nHope you\'ve had your Vitamin C.',
                     '\nProbably get yourself checked while you\'re here.',
                     '\nThey think this is bad? Wait until they find out about Space Madness.',
@@ -108,7 +101,6 @@ flavour_outbreak = ['\n*cough*',
 
 advisor_retreat = ' is in retreat!\nDo anything you can to re-establish our influence here.'
 flavour_retreat = ['\nNo, really, anything helps.',
-                    '\nDon\'t let the signal die!'
                     ]
 
 advisor_election = ' is taking part in an election in this system.\nTry to help out however you like, but leave your guns holstered, combat actions won\'t help here.'

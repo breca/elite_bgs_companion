@@ -1,8 +1,8 @@
 from . import log
 import sqlite3
 from collections import defaultdict
-
-
+from os import remove as careful_delete
+from os import path
 
 # connect to db
 class DatabaseAgent():
@@ -37,12 +37,35 @@ class DatabaseAgent():
     def check_setup(self):
         try:
             log.info('Checking database setup.')
-            sql = 'SELECT sql FROM sqlite_master '#FIXME make this a bit more robust
+            sql = 'SELECT sql FROM sqlite_master '
             self.cursor.execute(sql)
             result = self.cursor.fetchall()
             log.debug('DB Setup check returned: ' + str(result))
             if len(result) == 0:
                 self.setup()
+            else:
+                # If there are indeed databases, make sure the schema is up to snuff
+                schema_file = path.isfile('schema.dat')
+                if schema_file:
+                    with open('schema.dat', 'r') as f:
+                        saved = f.readlines()
+                        schema_check = eval(saved[0])
+                else:
+                    schema_check = 'Missing'
+
+                if result != schema_check:
+                    log.info('Recreating database.')
+                    log.debug('Old schema was:\n{}\nNew schema:\n{}'.format(result, schema_check))
+                    for i in 'voucher', 'mission', 'session':
+                        log.debug('Dropping table {}'.format(i))
+                        sql = 'drop table {}'.format(i)
+                        self.cursor.execute(sql)
+                        self.conn.commit()
+                    if schema_file != 'Missing':
+                        careful_delete('schema.dat')
+                    self.setup()
+                else:
+                    log.info('Database OK.')
         except Exception as e:
             log.exception('Exception occured checking database setup.', e)
             pass
@@ -56,14 +79,20 @@ class DatabaseAgent():
             self.cursor.execute(sql)
             self.conn.commit()
             log.info('BGS voucher table created.')
-            sql = '''CREATE TABLE IF NOT EXISTS mission (mission_id int unique default(0), mission_type text, mission_giver_system text, mission_giver_station text, mission_giver_faction text, mission_amount int default 0, mission_state text default 'accepted', processed text default 'False')'''
+            sql = '''CREATE TABLE IF NOT EXISTS mission (mission_id int unique default(0), mission_type text, mission_influence text, mission_giver_system text, mission_giver_station text, mission_giver_faction text, mission_amount int default 0, mission_state text default 'accepted', processed text default 'False')'''
             self.cursor.execute(sql)
             self.conn.commit()
             log.info('BGS mission table created.')
             sql = '''CREATE TABLE IF NOT EXISTS session (journal_file text, journal_byte_offset int, commander_name text, credits int, ship_name text, ship text, game_mode text, game_mode_group text, star_system text, system_is_target_faction_owned text, system_pop int, near_body text, near_body_type text, docked text, landed text, station_name text, station_faction text, target_faction_state text, old_target_faction_state text, location text, in_srv text)'''
             self.cursor.execute(sql)
             self.conn.commit()
-            log.info('Session data table created.')
+            log.info('Companion session table created.')
+            # Backup our current schema for version checks
+            sql = 'SELECT sql FROM sqlite_master'
+            self.cursor.execute(sql)
+            result = self.cursor.fetchall()
+            with open('schema.dat', 'w') as f:
+                f.write(str(result))
             self.check_setup()
         except Exception as e:
             log.exception('Exception occured during table creation.', e)
@@ -159,9 +188,10 @@ class DatabaseAgent():
             if not update['mission']['faction']:
                 raise ValueError('Update was:\n' + str(update) + '\nRuntime:\n' + str(runtime))
             log.info('Attempting to insert mission [{}] into BGS mission table.'.format(update['mission']['mission_id']))
-            sql = '''insert or ignore into mission values ("{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}")'''.format(
+            sql = '''insert or ignore into mission values ("{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}")'''.format(
                 update['mission']['mission_id'],
                 update['mission']['type'],
+                update['mission']['influence'],
                 runtime['star_system'],
                 runtime['station_name'],
                 update['mission']['faction'],
@@ -187,7 +217,7 @@ class DatabaseAgent():
     # return mission facts
     def lookup_mission(self, m_id):
         log.info('Fetching mission [{}] facts from database.'.format(m_id))
-        sql = 'select mission_giver_system, mission_giver_station, mission_giver_faction from mission where mission_id is "{}"'.format(m_id)
+        sql = 'select mission_giver_system, mission_giver_station, mission_giver_faction, mission_influence from mission where mission_id is "{}"'.format(m_id)
         self.cursor.execute(sql)
         res = self.cursor.fetchall()
         try:
@@ -195,6 +225,7 @@ class DatabaseAgent():
             a = res[0]['mission_giver_system']
             b = res[0]['mission_giver_station']
             c = res[0]['mission_giver_faction']
+            d = res[0]['mission_influence']
             return a, b, c
         except Exception as e:
             log.warning('Could not find mission ' + str(m_id) +'! May be already processed.')

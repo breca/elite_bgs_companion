@@ -1,62 +1,69 @@
-import requests
+from requests_futures.sessions import FuturesSession
 import webbrowser
 from . import log
 from tkinter import *
 from tkinter import ttk
-from queue import Queue
-import threading
 
-def fetch(msg_queue, config, queue):
+
+
+
+def fetch(config):
     log.info('Checking for latest version.')
     url = config['General']['VersionURL'] + 'rsc_version'
+    session = FuturesSession()
     try:
-        r = requests.get(url, timeout=5)
-        r.raise_for_status()
+        r = session.get(url, timeout=5)
+        response = r.result()
     except Exception as e:
-        log.exception('Unable to contact remote server. Reason: {}.'.format(e))
-        queue.put('Error')
-        pass
+        log.exception('Unable to contact remote server.', e)
+        response = 'Error'
+        return response
     else:
-        queue.put(r.json())
+        return response.json()
 
-def queue_checker(queue):
-    response = ''
-    log.debug('Version check waiting for response...')
-    while not response:
-        if not queue.empty():
-            response = queue.get(block = False)
-            if response == 'Error':
-                raise ConnectionError()
-            else:
-                return response
+
+
+
+def do_check(config, *force):
+    response = fetch(config)
+    if response != 'Error':
+        if config['General']['Version'] != response['version']: #found update
+            if config['General']['IgnoredUpdate'] != response['version'] or force:
+                if force == True:
+                    log.info('Forced update check result: Found new version: {}'.format(response['version']))
+                else:
+                    log.info('Found new version: {}'.format(response['version']))
+                win(response, config)
+            elif config['General']['IgnoredUpdate'] == response['version']:
+                log.info('Found update ({}) but user has elected to skip this one.'.format(response['version']))
+        elif config['General']['Version'] == response['version'] and force:
+            msg('Your version is up to date.', config['General']['Version'])
+            log.info('Forced update check result: Version is up to date. (Local: {}, Remote: {})'.format(config['General']['Version'], response['version']))
+        else:
+            log.info('This version is up to date.')
+
+
+
 
 def check(msg_queue, config, *force):
     try:
-        msg_queue.put('Checking for updates...')
-        log.info('Checking for updates.')
-        queue = Queue()
-        threading.Thread(target=fetch, args=(msg_queue, config, queue)).start()
-        response = queue_checker(queue)
-        if response != 'Error':
-            if config['General']['Version'] != response['version']: #found update
-                if config['General']['IgnoredUpdate'] != response['version'] or force:
-                    if force == True:
-                        log.info('Forced update check result: Found new version: {}'.format(response['version']))
-                    else:
-                        log.info('Found new version: {}'.format(response['version']))
-                    win(response, config)
-                elif config['General']['IgnoredUpdate'] == response['version']:
-                    log.info('Found update ({}) but user has elected to skip this one.'.format(response['version']))
-            elif config['General']['Version'] == response['version'] and force:
-                msg('Your version is up to date.', config['General']['Version'])
-                log.info('Forced update check result: Version is up to date. (Local: {}, Remote: {})'.format(config['General']['Version'], response['version']))
-            else:
-                log.info('This version is up to date.')
+        # If we haven't opted out, check for new version
+        if config['Options']['check_updates_on_start'] != 'False' and not force:
+            msg_queue.put('Checking for updates...')
+            log.info('Checking for updates.')
+            do_check(config)
+        # if we're clicking buttons
+        elif force:
+            msg_queue.put('Checking for updates...')
+            log.info('Checking for updates.')
+            do_check(config)
     except Exception as e:
         if force:
             msg('Could not retrieve update information at this time.')
         log.exception('Error occured during update check.', e)
         pass
+
+
 
 
 def msg(msgtxt, *version):
@@ -85,6 +92,8 @@ def msg(msgtxt, *version):
         ex_b.grid(row=2, column=0, columnspan=5, padx=3, pady=3, sticky=S)
 
 
+
+
 def skip_update(new_version, config, window):
     log.info('Ignoring this version ({}).'.format(new_version))
     try:
@@ -95,6 +104,9 @@ def skip_update(new_version, config, window):
     except Exception as e:
         log.exception('Could not update settings.ini!', e)
         window.destroy()
+        pass
+
+
 
 def win(response, config):
     version = config['General']['Version']
