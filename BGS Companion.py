@@ -103,8 +103,9 @@ def main():
     root.title("BGS Companion")
     root.geometry("610x340")
     root.iconbitmap(r'images\favicon.ico')
-    #root.wm_attributes('-transparentcolor','yellow')
     root.resizable(0,0) #Disable resize
+    root.rowconfigure(13, pad=10)
+    root.columnconfigure(2, weight=5)
 
     # Define vars
     global status_line
@@ -114,7 +115,6 @@ def main():
     global tick_countdown
     global session_stats
     status_line = StringVar()
-    #bgs_stats = defaultdict()
 
     '''-----------------------------------------'''
 
@@ -122,18 +122,8 @@ def main():
     menu_bar = Menu(root)
     root.config(menu=menu_bar)
 
-    # root.columnconfigure(0, weight=0)
-    root.rowconfigure(13, pad=10)
-    root.columnconfigure(2, weight=5)
-    # for i in range(1,15):
-    #     root.rowconfigure(i, pad=2)
-    #root.rowconfigure(5, weight=6)
-
     # 'Menu' menu
     menu_file = Menu(menu_bar,tearoff=0)
-
-    # 'Help' menu
-    #menu_help = Menu(menu_bar,tearoff=0)
 
     # 'About' menu
     menu_main = Menu(menu_bar,tearoff=0)
@@ -155,9 +145,6 @@ def main():
     menu_bar.add_command(label="Buy Skins", command=links.skin)
     menu_bar.add_command(label="Donate", command=links.donate)
 
-    #menu_bar.add_cascade(label="About", menu=menu_about)
-
-
 
     '''-----------------------------------------'''
 
@@ -165,6 +152,7 @@ def main():
     icon_image = ImageTk.PhotoImage(Image.open('images\logo_patch.png'))
     ic = Label(root, image=icon_image)
     ic.grid(column=0, row=0, rowspan=9, columnspan=2, sticky=N)
+
 
     '''-----------------------------------------'''
 
@@ -218,9 +206,6 @@ def main():
     session_frame.columnconfigure(1, weight=1)
     session_frame.columnconfigure(3, weight=1)
     session_frame.rowconfigure(10, weight=5)
-    #session_frame.rowconfigure(9, weight=2)
-    # session_frame.grid_propagate(False)
-    ###status_frame.rowconfigure(13, weight=2)
 
     session_stats_name_text = Label(session_frame, justify=CENTER, textvariable=stats['name'])
     session_stats_name_text.grid(column=0, row=0, columnspan=8, sticky=NSEW)
@@ -237,6 +222,12 @@ def main():
     # session_stats_rank = Label(session_frame, justify=LEFT, textvariable=stats['rank'])
     # session_stats_rank.grid(column=1, row=2, sticky=W)
     # session_stats_rank.grid_propagate(False)
+
+    # session_stats_rsc_text = Label(session_frame, justify=LEFT, text='RSC in-game:')
+    # session_stats_rsc_text.grid(column=0, row=4, sticky=E)
+    # session_stats_rsc = Label(session_frame, justify=LEFT, textvariable=stats['rsc'])
+    # session_stats_rsc.grid(column=1, row=4, sticky=W)
+    # session_stats_rsc.grid_propagate(False)
 
     session_stats_ship_text = Label(session_frame, justify=LEFT, text='Ship:')
     session_stats_ship_text.grid(column=0, row=1, sticky=E)
@@ -262,12 +253,6 @@ def main():
     session_stats_creditDelta.grid(column=1, row=4, sticky=W)
     session_stats_creditDelta.grid_propagate(False)
 
-    # session_stats_rsc_text = Label(session_frame, justify=LEFT, text='RSC in-game:')
-    # session_stats_rsc_text.grid(column=0, row=4, sticky=E)
-    # session_stats_rsc = Label(session_frame, justify=LEFT, textvariable=stats['rsc'])
-    # session_stats_rsc.grid(column=1, row=4, sticky=W)
-    # session_stats_rsc.grid_propagate(False)
-
     session_stats_gameMode_text = Label(session_frame, justify=LEFT, text='Game Mode:')
     session_stats_gameMode_text.grid(column=0, row=6, sticky=E)
     session_stats_gameMode = Label(session_frame, justify=LEFT, textvariable=stats['gameMode'], wraplength=300)
@@ -280,10 +265,6 @@ def main():
     session_stats_gameMode.grid(column=1, row=10, columnspan=4, sticky=W)
     session_stats_gameMode.grid_propagate(False)
 
-    # session_stats = Label(root,background='green', justify=LEFT)
-    # session_stats.grid(column=2, row=0, rowspan=2, sticky=E, pady="5")
-
-
     '''-----------------------------------------'''
 
     # bottom status bar
@@ -292,13 +273,12 @@ def main():
     status_frame.rowconfigure(0, weight=2)
     status_frame.rowconfigure(1, weight=2)
     status_frame.columnconfigure(0, weight=2)
-    #status_frame.grid_propagate(False)
+
     status_bar = ttk.Label(status_frame, textvariable=status_line, justify=LEFT, anchor=W, wraplength=590)
     status_bar.grid(column=0, row=0, sticky=W)#place(x=3, rely=0.86, width=600)
     status_bar.grid_propagate(False)
     buffer_lbl = ttk.Label(status_frame, text='\n', justify=LEFT, anchor=W)
     buffer_lbl.grid(column=0, row=1, sticky=W)
-    #status_bar.place(x=3, rely=0.86)#.grid(column=0, row=20, columnspan=2, rowspan=2, sticky=N, ipady=10)
 
     buttons_frame = ttk.Frame(root, padding="3 3 3 3",)#, padding="200 3 200 3")
     buttons_frame.grid(sticky="N,E,S,W")
@@ -306,6 +286,7 @@ def main():
     buttons_frame.place(y=230,x=510)#relx=0.32)
     button_view_bgs = ttk.Button(buttons_frame, text='View BGS Stats', command=lambda: window_bgs(root, monitor_data, runtime))
     button_view_bgs.grid(column=1, row=3)
+
 
     '''###########################################
     #                threading
@@ -318,7 +299,6 @@ def main():
     monitor_status = MessageMonitor(msg_queue)
     monitor_journal = JournalMonitor(msg_queue, data_queue)
     start_threads(monitor_data, monitor_status, monitor_journal)
-
 
 
     '''###########################################
@@ -562,7 +542,6 @@ def time_local():
     # get the current local time from the PC
     time = dt.datetime.now()
     time_string = dt.datetime.strftime(time, '%H:%M:%S')
-    #date_string = dt.datetime.strptime('%Y-%m-%d', time)
 
     # if time string has changed, update it
     local_clock.config(text=time_string)
@@ -575,7 +554,6 @@ def time_server():
     # get the current local time from the PC
     time = dt.datetime.utcnow()
     time_string = dt.datetime.strftime(time, '%H:%M:%S')
-    #date_string = dt.datetime.strptime('%Y-%m-%d', time)
 
     # if time string has changed, update it
     server_clock.config(text=time_string)
@@ -585,7 +563,6 @@ def time_server():
 # board countdown timer for main window
 def tick_board():
     time = dt.datetime.utcnow()
-    #time = time.replace(hour=11, minute=59, second=48) ##DEBUG
     ticks = [00,15,30,45] #Boards refresh every 15 minutes
 
     for tick in ticks:
@@ -620,7 +597,6 @@ def tick_board():
         except Exception as e:
             log.exception('Exception occured determining time. Values - tick: {} tick_time: {} remainder: {} a: {}'.format(tick, tick_time, remainder, a))
             pass
-    ##print(countdown) ##DEBUG
     if 'countdown' not in locals():
         countdown = str('Time is hard, you don\'t even know.')  #If things are working you shouldn't see this
     # if time string has changed, update it
@@ -631,8 +607,6 @@ def tick_board():
 # influence tick countdown timer for main window
 def tick_server():
     server_time = dt.datetime.utcnow()
-    #server_time = dt.datetime.strptime('11:59:45 2018-01-21', '%H:%M:%S %Y-%m-%d')  ##DEBUG
-    #server_time = dt.datetime.strptime('12:23:02 2018-01-21', '%H:%M:%S %Y-%m-%d')  ##DEBUG
     server_tick_start = server_time.replace(hour=12, minute=0, second=0)
     server_tick_end = server_time.replace(hour=13, minute=0, second=0)
 
@@ -648,7 +622,6 @@ def tick_server():
         ##print('updating now') ##DEBUG
         server_upcoming_tick_delta = 'Influence is currently being updated.'
         #REVIEW perhaps check eddb for updates around this time?
-    ###log.debug('delta: ' + str((server_upcoming_tick_delta.total_seconds())))
     try:
         if server_upcoming_tick_delta.seconds >=3600: #more than an hour
             ##print('by more than an hour') ##DEBUG
@@ -661,15 +634,11 @@ def tick_server():
             countdown = str('Influence tick begins in {0} minutes.'.format(int(server_upcoming_tick_delta.total_seconds() / 60)))
         elif server_upcoming_tick_delta.seconds <60:
             countdown = str('Influence tick begins shortly.'.format(int(server_upcoming_tick_delta.total_seconds() / 60)))
-            ##print('by less than an hour') ##DEBUG
-            ##print(server_upcoming_tick_delta)
     except Exception as e:
         try:
             countdown = server_upcoming_tick_delta
         except Exception as e:
             log.exception('Encountered exception determine influence tick.')
-        ##print('countdown' + str(countdown))
-        ##print(e)
         pass
 
     tick_countdown.config(text=countdown)
@@ -680,8 +649,6 @@ def tick_server():
 '''###########################################
 #           misc. window/menu functions
 ###########################################'''
-
-
 
 
 # close gracefully
@@ -716,7 +683,6 @@ def advisor_state_flavour_text():
 
 
 
-
 '''###########################################
 #             thread config
 ###########################################'''
@@ -724,14 +690,9 @@ def advisor_state_flavour_text():
 def start_threads(monitor_data, monitor_status, monitor_journal):
     try:
         log.info('Starting threads and configuring session.')
-        #if runtime['journal_file'] is not '':
-            # don't bother starting these until we have a file to look at
-        #    if not monitor_data.is_alive():
         monitor_data.start()
         monitor_data.configure_session(runtime)
-        #    if not monitor_status.is_alive():
         monitor_status.start()
-#        if not monitor_journal.is_alive():
         monitor_journal.start()
     except Exception as e:
         log.exception('Exception occured ensuring threads were alive.', e)
@@ -746,24 +707,20 @@ class MessageMonitor(threading.Thread):
         self.msgqueue = status_queue
 
     def run(self):
-        #log.debug('Starting MessageMonitor.')
         self.monitor_messages()
 
     def ts(self): #return timestamp
         self.time = dt.datetime.strftime(dt.datetime.utcnow(), '%H:%M:%S - ')
 
     def stop(self):
-        #log.debug('Stopping MessageMonitor.')
         self._stop_event.set()
 
     def stopped(self):
-        #log.debug('Stopped MessageMonitor.')
         return self._stop_event.is_set()
 
     def monitor_messages(self):
         while not self.stopped():
             try:
-                #log.debug('MessageMonitor checking queue.')
                 self.ts()
                 msg = self.msgqueue.get(block = False)
                 msg = self.time + msg
@@ -789,21 +746,17 @@ class DataBroker(threading.Thread):
         self.sql = db.DatabaseAgent()
 
     def run(self):
-        #log.debug('Starting DataBroker.')
         self.monitor_data()
 
     def stop(self):
-        #log.debug('Stopping DataBroker.')
         self._stop_event.set()
 
     def stopped(self):
-        #log.debug('Stopped DataBroker.')
         return self._stop_event.is_set()
 
     def monitor_data(self):
         while not self.stopped():
             try:
-                #log.debug('DataBroker checking queue')
                 if not self.datqueue.empty():
                     data = self.datqueue.get(block = False)
                     log.debug('DataBroker received: ' + str(data))
@@ -888,7 +841,6 @@ class DataBroker(threading.Thread):
 
 # Journal handler
 class JournalMonitor(threading.Thread):
-    #print('Initalising JournalMonitor') ##DEBUG
     def __init__(self, status_queue, data_queue):
         log.info('Initialsing JournalMonitor')
         super(JournalMonitor, self).__init__()
@@ -898,15 +850,12 @@ class JournalMonitor(threading.Thread):
         self.journal_path = runtime['journal_path']
 
     def run(self):
-        #log.debug('Starting JournalMonitor.')
         self.monitor_journal()
 
     def stop(self):
-        #log.debug('Stopping JournalMonitor.')
         self._stop_event.set()
 
     def stopped(self):
-        #log.debug('Stopped JournalMonitor.')
         return self._stop_event.is_set()
 
     def update_offset(self):
@@ -918,11 +867,8 @@ class JournalMonitor(threading.Thread):
         while not self.stopped():
             self.newfile = False
             try:
-                #log.debug('JournalMonitor checking for new file.')
                 newest = max(glob.iglob(path.join(runtime['journal_path'], '*.log')), key=path.getctime)
-                #newest = 'Journaljimbo.log' #DEBUG
-                #newest = 'Journal.test' #DEBUG
-                #newest = 'Journal.big.test' #DEBUG
+
                 if runtime['journal_file'] != newest:
                     runtime['journal_file'] = newest
                     self.msgqueue.put('New journal detected. Opening file.')
@@ -955,7 +901,6 @@ class JournalMonitor(threading.Thread):
 
 
     def parse(self, file_data):
-        #log.debug('JournalMonitor checking for updates.')
         if file_data:
             data = json.loads(file_data)
             log.debug('JournalMonitor parsing JSON')
@@ -1277,12 +1222,12 @@ class JournalMonitor(threading.Thread):
                                 'karsukilocusts', 'livehecateseaworms', 'ltthypersweet', 'mechucoshightea', 'mokojingbeastfeast', 'mukusubiichitin-os',
                                  'mulachigiantfungus', 'neritusberries', 'ochoengchillies', 'orrerianviciousbrew', 'sanumadecorativemeat', 'syntheticmeat',
                                   'tanmarktranquiltea', 'tea', 'uszaiantreegrub', 'utgaroarmillennialeggs', 'voidextractcoffee', 'wheemetewheatcakes',
-                                   'witchhaulkobebeef'] #REVIEW may not be accurate #FIXME export this to config
+                                   'witchhaulkobebeef'] #REVIEW may not be accurate
         weapon_commodities = ['battleweapons', 'borasetanipathogenetics', 'gilyasignatureweapons', 'hip118311swarm', 'holvaduellingblades',
-                              'kamorinhistoricweapons', 'landmines', 'non-lethalweapons', 'personalweapons', 'reactivearmour'] #REVIEW may not be accurate #FIXME export this to config
+                              'kamorinhistoricweapons', 'landmines', 'non-lethalweapons', 'personalweapons', 'reactivearmour'] #REVIEW may not be accurate
         medicine_commodities = ['aganipperush', 'agri-medicines', 'alyabodysoap', 'basicmedicines', 'combatstabilisers', 'fujintea', 'honestypills',
                                 'kachiriginfilterleeches', 'pantaaprayersticks', 'performanceenhancers', 'progenitorcells', 'taurichimes', 'terramaterbloodbores',
-                                 'vherculisbodyrub', 'vegaslimweed', 'watersofshintara'] #REVIEW may not be accurate #FIXME export this to config
+                                 'vherculisbodyrub', 'vegaslimweed', 'watersofshintara'] #REVIEW may not be accurate
 
         state = runtime['target_faction_state']
 
