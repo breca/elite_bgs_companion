@@ -24,27 +24,39 @@ def fetch(config):
 
 
 
+def do_check(config, *force):
+    response = fetch(config)
+    if response != 'Error':
+        if config['General']['Version'] != response['version']: #found update
+            if config['General']['IgnoredUpdate'] != response['version'] or force:
+                if force == True:
+                    log.info('Forced update check result: Found new version: {}'.format(response['version']))
+                else:
+                    log.info('Found new version: {}'.format(response['version']))
+                win(response, config)
+            elif config['General']['IgnoredUpdate'] == response['version']:
+                log.info('Found update ({}) but user has elected to skip this one.'.format(response['version']))
+        elif config['General']['Version'] == response['version'] and force:
+            msg('Your version is up to date.', config['General']['Version'])
+            log.info('Forced update check result: Version is up to date. (Local: {}, Remote: {})'.format(config['General']['Version'], response['version']))
+        else:
+            log.info('This version is up to date.')
+
+
+
+
 def check(msg_queue, config, *force):
     try:
-        msg_queue.put('Checking for updates...')
-        log.info('Checking for updates.')
-
-        response = fetch(config)
-        if response != 'Error':
-            if config['General']['Version'] != response['version']: #found update
-                if config['General']['IgnoredUpdate'] != response['version'] or force:
-                    if force == True:
-                        log.info('Forced update check result: Found new version: {}'.format(response['version']))
-                    else:
-                        log.info('Found new version: {}'.format(response['version']))
-                    win(response, config)
-                elif config['General']['IgnoredUpdate'] == response['version']:
-                    log.info('Found update ({}) but user has elected to skip this one.'.format(response['version']))
-            elif config['General']['Version'] == response['version'] and force:
-                msg('Your version is up to date.', config['General']['Version'])
-                log.info('Forced update check result: Version is up to date. (Local: {}, Remote: {})'.format(config['General']['Version'], response['version']))
-            else:
-                log.info('This version is up to date.')
+        # If we haven't opted out, check for new version
+        if config['Options']['check_updates_on_start'] != 'False' and not force:
+            msg_queue.put('Checking for updates...')
+            log.info('Checking for updates.')
+            do_check(config)
+        # if we're clicking buttons
+        elif force:
+            msg_queue.put('Checking for updates...')
+            log.info('Checking for updates.')
+            do_check(config)
     except Exception as e:
         if force:
             msg('Could not retrieve update information at this time.')
