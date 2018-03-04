@@ -129,7 +129,7 @@ def main():
     menu_main = Menu(menu_bar,tearoff=0)
 
     menu_main.add_command(label="Settings", command=lambda: window_options(root, config))
-    menu_main.add_command(label="Check for updates", command=lambda: check_version(msg_queue, config, True))
+    menu_main.add_command(label="Check for updates", command=lambda: check_version(root, msg_queue, config, True))
     menu_main.add_separator()
     menu_main.add_command(label="Request a feature", command=lambda: window_feature_req(root))
     menu_main.add_command(label="Report a bug", command=lambda: window_report_bug(root))
@@ -311,16 +311,16 @@ def main():
 
     root.protocol("WM_DELETE_WINDOW", lambda: graceful_close(root, monitor_data, monitor_status, monitor_journal))
     root.after(300, session_updater)
-    root.after(2000, lambda: check_version(msg_queue, config))
+    root.after(2000, lambda: check_version(root, msg_queue, config))
     root.mainloop()
 
 
 # check for updates
-def check_version(msg_queue, config, *force):
+def check_version(window, msg_queue, config, *force):
     if force:
-        version_checker.check(msg_queue, config, force)
+        version_checker.check(window, msg_queue, config, force)
     else:
-        version_checker.check(msg_queue, config)
+        version_checker.check(window, msg_queue, config)
 
 # timezone window
 def window_timezones():
@@ -374,7 +374,7 @@ def session_stats_update():
         if runtime['stats_set']:
             # choose a random greeting
             #log.debug('Assigning statistics to values.')
-            greet_text = ['Welcome, Commander ', 'Praise the signal, it\'s Commander ', 'Good to see you, Commander ', 'Commander ']
+            greet_text = ['Welcome, Commander ', 'Good to see you, Commander ', 'Commander ', 'Lets get to work, Commander']
             if not runtime['name_set']:
                 stats['name'].set(random.choice(greet_text) + runtime['commander_name'] + '.')
                 runtime['name_set'] = True
