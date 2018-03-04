@@ -9,7 +9,7 @@ from tkinter import ttk
 
 def fetch(config):
     log.info('Checking for latest version.')
-    url = config['General']['VersionURL']
+    url = config['General']['Version_URL']
     session = FuturesSession()
     try:
         r = session.get(url, timeout=5)
@@ -25,7 +25,7 @@ def fetch(config):
 
 
 
-def do_check(config, *force):
+def do_check(parent, msg_queue, config, *force):
     response = fetch(config)
     if response != 'Error':
         if config['General']['Version'] != response['version']: #found update
@@ -33,43 +33,46 @@ def do_check(config, *force):
                 if force == True:
                     log.info('Forced update check result: Found new version: {}'.format(response['version']))
                 else:
+                    msg_queue.put('Found new version: {}'.format(response['version']))
                     log.info('Found new version: {}'.format(response['version']))
-                win(response, config)
+                win(parent, response, config)
             elif config['General']['IgnoredUpdate'] == response['version']:
+                msg_queue.put('Update available. Select \'Menu > Check for updates\' to get the latest version.')
                 log.info('Found update ({}) but user has elected to skip this one.'.format(response['version']))
         elif config['General']['Version'] == response['version'] and force:
-            msg('Your version is up to date.', config['General']['Version'])
+            msg(parent,'Your version is up to date.', config['General']['Version'])
             log.info('Forced update check result: Version is up to date. (Local: {}, Remote: {})'.format(config['General']['Version'], response['version']))
         else:
+            msg_queue.put('This version is up to date.')
             log.info('This version is up to date.')
 
 
 
 
-def check(msg_queue, config, *force):
+def check(parent, msg_queue, config, *force):
     try:
         # If we haven't opted out, check for new version
         if config['Options']['check_updates_on_start'] != 'False' and not force:
             msg_queue.put('Checking for updates...')
             log.info('Checking for updates.')
-            do_check(config, *force)
+            do_check(parent, msg_queue, config)
         # if we're clicking buttons
         elif force:
             msg_queue.put('Checking for updates...')
             log.info('Checking for updates.')
-            do_check(config)
+            do_check(parent, msg_queue, config, force)
     except Exception as e:
         if force:
-            msg('Could not retrieve update information at this time.')
+            msg(parent, 'Could not retrieve update information at this time.')
         log.exception('Error occured during update check.', e)
         pass
 
 
 
 
-def msg(msgtxt, *version):
-    m_win = Tk()
-    m_win.title('RSC: Update check')
+def msg(parent, msgtxt, *version):
+    m_win = Toplevel(parent)
+    m_win.geometry("+%d+%d" % (parent.winfo_rootx(), parent.winfo_rooty()))
     m_win.iconbitmap(r'.\images\favicon.ico')
     m_frame = ttk.Frame(m_win, padding="10 10 10 10")
     m_frame.grid()
@@ -109,12 +112,13 @@ def skip_update(new_version, config, window):
 
 
 
-def win(response, config):
+def win(parent, response, config):
     version = config['General']['Version']
-    url = config['General']['VersionURL']
-    url = url + 'RSC Companion.zip'
-    v_win = Tk()
-    v_win.title('RSC: Update available!')
+    url = config['General']['Version_URL']
+    url = url + config['General']['distribution_url']
+    v_win = Toplevel(parent)
+    v_win.geometry("+%d+%d" % (parent.winfo_rootx(), parent.winfo_rooty()))
+    v_win.title('Update available!')
     v_win.iconbitmap(r'.\images\favicon.ico')
 
     v_frame = ttk.Frame(v_win, padding="10 10 10 10")
@@ -146,7 +150,7 @@ def win(response, config):
     mt_lbl = Label(v_frame, text="        ", padx=3, pady=3)
     mt_lbl.grid(row=row, column=0, columnspan=4, sticky=W)
 
-    g_btn = Button(v_frame, text='Grab it!', borderwidth=1, padx=10, pady=5, command=lambda: webbrowser.open_new(url))
+    g_btn = Button(v_frame, text='Grab it!', borderwidth=1, padx=10, pady=5, command=lambda: webbrowser.open_new(config['General']['distribution_url']))
     g_btn.grid(row=row+1, column=0, columnspan=1, padx=3, pady=3, sticky=S)
     x_btn = Button(v_frame, text='Skip this update', borderwidth=1, padx=10, pady=5, command=lambda: skip_update(response['version'], config, v_win))
     x_btn.grid(row=row+1, column=1, columnspan=3, padx=3, pady=3, sticky=S)
