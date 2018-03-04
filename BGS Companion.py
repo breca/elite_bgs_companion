@@ -44,6 +44,7 @@ from lib.window_options import window_options
 from lib.advisor import advisor
 from lib import links
 from lib import version_checker
+from lib import eddn_sender
 
 config = configparser.ConfigParser()
 config.read('settings.ini')
@@ -136,7 +137,7 @@ def main():
     menu_main.add_separator()
     menu_main.add_command(label="Credits", command=lambda: window_credits(root))
     menu_main.add_separator()
-    menu_main.add_command(label="Exit", command=lambda: graceful_close(root, monitor_data, monitor_status, monitor_journal))
+    menu_main.add_command(label="Exit", command=lambda: graceful_close(root, monitor_data, monitor_status, monitor_journal, eddn_dispatcher))
 
     # Add menus to menu bar
     menu_bar.add_cascade(label="Menu", menu=menu_main)
@@ -298,7 +299,8 @@ def main():
     monitor_data = DataBroker(msg_queue, data_queue)
     monitor_status = MessageMonitor(msg_queue)
     monitor_journal = JournalMonitor(msg_queue, data_queue)
-    start_threads(monitor_data, monitor_status, monitor_journal)
+    eddn_dispatcher = eddn_sender.EDDN_dispatcher(runtime['journal_path'], config)
+    start_threads(monitor_data, monitor_status, monitor_journal, eddn_dispatcher)
 
 
     '''###########################################
@@ -309,7 +311,7 @@ def main():
         session_stats_update()
         root.after(300, session_updater)
 
-    root.protocol("WM_DELETE_WINDOW", lambda: graceful_close(root, monitor_data, monitor_status, monitor_journal))
+    root.protocol("WM_DELETE_WINDOW", lambda: graceful_close(root, monitor_data, monitor_status, monitor_journal, eddn_dispatcher))
     root.after(300, session_updater)
     root.after(2000, lambda: check_version(root, msg_queue, config))
     root.mainloop()
@@ -374,7 +376,7 @@ def session_stats_update():
         if runtime['stats_set']:
             # choose a random greeting
             #log.debug('Assigning statistics to values.')
-            greet_text = ['Welcome, Commander ', 'Good to see you, Commander ', 'Commander ', 'Lets get to work, Commander']
+            greet_text = ['Welcome, Commander ', 'Good to see you, Commander ', 'Commander ', 'Lets get to work, Commander ']
             if not runtime['name_set']:
                 stats['name'].set(random.choice(greet_text) + runtime['commander_name'] + '.')
                 runtime['name_set'] = True
@@ -652,7 +654,7 @@ def tick_server():
 
 
 # close gracefully
-def graceful_close(root, monitor_data, monitor_status, monitor_journal):
+def graceful_close(root, monitor_data, monitor_status, monitor_journal, eddn_dispatcher):
         log.info('Stopping all threads.')
         if monitor_status.isAlive():
             monitor_status.stop()
@@ -660,6 +662,9 @@ def graceful_close(root, monitor_data, monitor_status, monitor_journal):
         if monitor_journal.isAlive():
             runtime['journal_byte_offset'] = monitor_journal.update_offset()
             monitor_journal.join()
+        if eddn_dispatcher.isAlive():
+            eddn_dispatcher.stop()
+            eddn_dispatcher.join()
         monitor_data.save_session(runtime)
         if not monitor_journal.isAlive():
             monitor_data.join()
@@ -687,13 +692,15 @@ def advisor_state_flavour_text():
 #             thread config
 ###########################################'''
 
-def start_threads(monitor_data, monitor_status, monitor_journal):
+def start_threads(monitor_data, monitor_status, monitor_journal, eddn_dispatcher):
     try:
         log.info('Starting threads and configuring session.')
         monitor_data.start()
         monitor_data.configure_session(runtime)
         monitor_status.start()
         monitor_journal.start()
+        if eval(config['Options']['eddn_enabled']):
+            eddn_dispatcher.start()
     except Exception as e:
         log.exception('Exception occured ensuring threads were alive.', e)
 
