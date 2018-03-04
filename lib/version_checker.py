@@ -13,13 +13,14 @@ def fetch(config):
     session = FuturesSession()
     try:
         r = session.get(url, timeout=5)
-        response = r.result()
+        res = r.result()
+        response = res.json()
     except Exception as e:
-        log.exception('Unable to contact remote server.', e)
+        log.exception('Update check failed: ', e)
         response = 'Error'
         return response
     else:
-        return response.json()
+        return response
 
 
 
@@ -51,7 +52,7 @@ def check(msg_queue, config, *force):
         if config['Options']['check_updates_on_start'] != 'False' and not force:
             msg_queue.put('Checking for updates...')
             log.info('Checking for updates.')
-            do_check(config)
+            do_check(config, *force)
         # if we're clicking buttons
         elif force:
             msg_queue.put('Checking for updates...')
