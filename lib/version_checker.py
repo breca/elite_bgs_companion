@@ -9,7 +9,7 @@ from tkinter import ttk
 
 def fetch(config):
     log.info('Checking for latest version.')
-    url = config['General']['VersionURL'] + 'rsc_version'
+    url = config['General']['VersionURL']
     session = FuturesSession()
     try:
         r = session.get(url, timeout=5)
