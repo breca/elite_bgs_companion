@@ -140,10 +140,10 @@ def main():
 
     # Add menus to menu bar
     menu_bar.add_cascade(label="Menu", menu=menu_main)
-    menu_bar.add_command(label="Hear the Signal", command=links.listen)
     menu_bar.add_command(label="Timezones", command=window_timezones)
-    menu_bar.add_command(label="Buy Skins", command=links.skin)
-    menu_bar.add_command(label="Donate", command=links.donate)
+    menu_bar.add_command(label="Radio", command=lambda: links.listen(config))
+    menu_bar.add_command(label="Buy Skins", command=lambda: links.skin(config))
+    menu_bar.add_command(label="Donate", command=lambda: links.donate(config))
 
 
     '''-----------------------------------------'''
