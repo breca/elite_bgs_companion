@@ -742,9 +742,8 @@ class MessageMonitor(threading.Thread):
 
 # Data queue monitor
 class DataBroker(threading.Thread):
-    log.info('Initalising DataBroker') ##DEBUG
     def __init__(self, message_queue, data_queue):
-        log.debug('Initialsing DataBroker')
+        log.info('Initialsing DataBroker')
         super(DataBroker, self).__init__()
         self._stop_event = threading.Event()
         self.datqueue = data_queue
