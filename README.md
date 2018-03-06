@@ -75,39 +75,52 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ## Changelog:
  * Version 0.9a
  	Updated some events for Elite: Beyond.
+	
 	Now shows mission influence counts in mission copy/paste info
 	Instead of tracking EVERY commodity, Trade data now lumps them
 	into categories (all the game cares about).
+	
 	Additionally, trades with profit margins of over 700 credits
 	are marked as 'High' trades, less than 700 as 'Low' Trades 
 	as these have a larger/lesser affect.
+	
 	Trade losses are now tracked (not reported on yet), sorry..
+	
 	Altered window behaviour - child windows now appear next to
 	parent window.
+	
 	Some groundwork to make future updates a bit more seamless.
 	Anonymously sends updates to EDDN (enabled by default).
+	
 	Users can now opt-out of checking for updates at start of
 	every session.
+	
 	Added options window and changed menu layout to accomodate.
  
  * Version 0.81a
 	 Hotfix for lack of copy/paste and other issues brought about by
 	 sloppy code refactoring and sleep deprivation.
+	 
 	 Attempted to fix update check from blocking. Not there yet. :(
+	 
 	 Improved location parsing.
 
  * Version 0.8a
 	 Additional exception handling around database backend.
+	 
 	 Changed journal parsing behaviour - the application now remembers
 	 it's position in the journal and will resume where it left off -
 	 until it detects a new journal file, when it'll just use that
 	 instead.
+	 
 	 Journal position and other stats are now inserted into the database
 	 on exit.
+	 
 	 Added version checker.
 
  * Version 0.7a
 	 Fixes for missing exploration/trade/smuggling faction data.
+	 
 	 Fixed ugly database call that potentially causes loss of
 	 BGS data (Thanks Yojimbosan!).
 
@@ -125,6 +138,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * Version 0.3a
 	 Trade now determines whether you made a profit or not and reports
 	 that info to the user in realtime.
+	 
 	 In addition to the normal BGS logic set, trade and smuggling are
 	 now only recorded if a profit is made (and only the net profit
 	 is added to the report).
@@ -133,8 +147,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	 Reimplemented missions. It's really hacky but it seems to work.
 	 Whatever. Missions now track where you picked them up from (and
 	 who) and adjusts BGS stats accordingly.
+	 
 	 Reformatted BGS stats page to better represent who/what you're
 	 looking at.
+	 
 	 Now captures BGS data for other factions besides RSC.
 
  * Version 0.1a
