@@ -19,7 +19,7 @@ def window_bgs(root, databroker, runtime):
 
     # Create a canvas, then a frame embedded into the canvas. Attach a scrollbar to the canvas
     # qv https://stackoverflow.com/questions/3085696/adding-a-scrollbar-to-a-group-of-widgets-in-tkinter
-    bgs_canvas = Canvas(bgs_win, width=650)
+    bgs_canvas = Canvas(bgs_win, width=730)
 
     bgs_vsb = Scrollbar( bgs_win, orient="vertical", command=bgs_canvas.yview)
     bgs_canvas.configure(yscrollcommand=bgs_vsb.set)
