@@ -1,0 +1,4 @@
+{
+  "version": "0.9a",
+  "changelog": ["* Added options window and changed menu layout to accomodate", "* Anonymously sends updates to EDDN (enabled by default)", "* Users can now opt-out of checking for updates at start of every session", "* Updated some events for Elite: Beyond", "* Now shows mission influence counts in mission copy/paste info", "* Instead of tracking EVERY commodity, Trade data now lumps them into categories (all the game cares about).", "* Additionally, trades with profit margins of over 700 credits are marked as 'High' trades, less than 700 as 'Low' Trades as these have a larger/lesser affect.", "* Trade losses are now tracked (not reported on yet), sorry", "* Altered window behaviour - child windows now appear next to parent window", "* Some groundwork to make future updates a bit more seamless (still WIP)"]
+}
