@@ -73,7 +73,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ## Changelog:
-
+ * Version 0.9a
+ 	Updated some events for Elite: Beyond.
+	Now shows mission influence counts in mission copy/paste info
+	Instead of tracking EVERY commodity, Trade data now lumps them
+	into categories (all the game cares about).
+	Additionally, trades with profit margins of over 700 credits
+	are marked as 'High' trades, less than 700 as 'Low' Trades 
+	as these have a larger/lesser affect.
+	Trade losses are now tracked (not reported on yet), sorry..
+	Altered window behaviour - child windows now appear next to
+	parent window.
+	Some groundwork to make future updates a bit more seamless.
+	Anonymously sends updates to EDDN (enabled by default).
+	Users can now opt-out of checking for updates at start of
+	every session.
+	Added options window and changed menu layout to accomodate.
+ 
  * Version 0.81a
 	 Hotfix for lack of copy/paste and other issues brought about by
 	 sloppy code refactoring and sleep deprivation.
