@@ -248,6 +248,9 @@ class DatabaseAgent():
             if update['voucher']['type'] not in ['CombatBond', 'bounty']:
                 if not runtime['station_faction']:
                     raise ValueError('Update was:\n' + str(update) + '\nRuntime:\n' + str(runtime))
+                if update['voucher']['type'] == 'scannable':
+                    update['voucher']['amount'] = update['voucher']['factions'][0][-1] # This is a bit of kludge, scannable data is a pittance and can be lumped in here for now
+                    update['voucher']['type'] = 'exploration'
                 sql = '''insert or ignore into voucher values ("{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}")'''.format(
                     runtime['star_system'],
                     runtime['station_name'],
@@ -359,7 +362,7 @@ class DatabaseAgent():
             exit(4)
         try:
             log.debug('Fetching mission data from BGS table.')
-            sql = '''select mission_id as rowid, mission_amount as amount, mission_type as type, mission_giver_faction as faction, mission_giver_station as station, mission_giver_system as system from mission where mission_state is not 'accepted' and processed is "False"'''.format(runtime['target_faction'])
+            sql = '''select mission_id as rowid, mission_amount as amount, mission_type as type, mission_giver_faction as faction, mission_giver_station as station, mission_giver_system as system, mission_influence as influence from mission where mission_state is not 'accepted' and processed is "False"'''.format(runtime['target_faction'])
             #sql = 'select * from mission'
             self.cursor.execute(sql)
             m_results = self.cursor.fetchall()
@@ -378,7 +381,7 @@ class DatabaseAgent():
         #                                                                                'bounty': [500, [1,5,23]],  # <total amount, [<table row_ids>]
         #                                                                                'trade': [500, ['foo'], [3,6,7]],  # <profits, [<commodities>], [<table row_ids>]
         #                                                                                'smuggled': [500, ['foo'], [2,8,4]],
-        #                                                                                'mission': [500, ['foo'], [2,8,4]],
+        #                                                                                'mission': [500, ['High', 'Low' 'High'], [2,8,4]], # <Profit / [Influence] / [<table row_ids>]
         #                                                                                'donation': [500, [2,8,4]], # mission_ids instead of rowids
         #                                                                                 },
         #
@@ -471,13 +474,14 @@ class DatabaseAgent():
                 # create voucher dict if not present
                 if entry['type'] not in report_dict[entry['system']][entry['station']][entry['faction']]['transaction'].keys():
                     log.debug('BGS report (mission) generator creating new voucher of type '+ entry['type'])
-                    report_dict[entry['system']][entry['station']][entry['faction']]['transaction'][entry['type']] = {}
+                    report_dict[entry['system']][entry['station']][entry['faction']]['transaction'][entry['type']] = [0, [], []]
                 # add data to voucher dict
-                if len(report_dict[entry['system']][entry['station']][entry['faction']]['transaction'][entry['type']]) <2:
-                    log.debug('BGS report generator determined this is a fresh mission type')
-                    report_dict[entry['system']][entry['station']][entry['faction']]['transaction'][entry['type']] = [0, []]
+                # if len(report_dict[entry['system']][entry['station']][entry['faction']]['transaction'][entry['type']]) <2:
+                #     log.debug('BGS report generator determined this is a fresh mission type')
+                #     report_dict[entry['system']][entry['station']][entry['faction']]['transaction'][entry['type']] = [0, []]
                 log.debug('BGS report generator adding this ' + entry['type'] + ' amount to total for this transaction type')
                 report_dict[entry['system']][entry['station']][entry['faction']]['transaction'][entry['type']][0] += entry['amount']
+                report_dict[entry['system']][entry['station']][entry['faction']]['transaction'][entry['type']][1].append(entry['influence'])
                 report_dict[entry['system']][entry['station']][entry['faction']]['transaction'][entry['type']][-1].append(entry['rowid'])
 
         log.debug('Final BGS report :\n'+ str(report_dict))
