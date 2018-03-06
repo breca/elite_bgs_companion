@@ -45,6 +45,7 @@ from lib.advisor import advisor
 from lib import links
 from lib import version_checker
 from lib import eddn_sender
+from lib import commodities
 
 config = configparser.ConfigParser()
 config.read('settings.ini')
@@ -1099,8 +1100,7 @@ class JournalMonitor(threading.Thread):
             elif event == 'Liftoff':
                 log.debug('JournalMonitor found ' + event + '.')
                 update['landed'] = False
-                if runtime['in_srv'] and data['PlayerControlled'] == 'true':
-                    update['in_srv'] = False   # SRV death inferred here
+
 
             # ----- BGS related stuff -----
 
@@ -1120,7 +1120,8 @@ class JournalMonitor(threading.Thread):
                                 update['voucher']['factions'].append([f['Faction'],f['Amount']])
                                 faction_no +=1
                 else:
-                    update['voucher']['factions'].append([data['Faction'], data['Amount']])
+                    update['voucher']['factions'].append([runtime['station_faction'], data['Amount']])
+                    #update['voucher']['factions'].append([data['Faction'], data['Amount']])  ##REVIEW this seems wrong, try above
                 update['voucher']['valid'] = self.valid_voucher(update['voucher'])
 
             # filter missions out from donations
@@ -1151,34 +1152,45 @@ class JournalMonitor(threading.Thread):
 
                 if 'Reward' in data.keys():
                     update['mission']['amount'] = data['Reward']
-                elif 'Donation' in data.keys():
-                    update['mission']['amount'] = data['Donation']
+                elif 'Donation' in data.keys():                         ## REVIEW FIXME Due to 3.0, mission rewards are
+                    update['mission']['amount'] = data['Donation']      # handled differently and may need to be rewritten
                 update['mission']['status'] = 'completed'
                 update['mission']['valid'] = self.valid_voucher(update['mission'])
 
             elif event == 'SellExplorationData':
                 log.debug('JournalMonitor found ' + event + '.')
-                update['voucher']['timestamp'] = data['timestamp'] #REVIEW
+                update['voucher']['timestamp'] = data['timestamp']
                 update['voucher']['type'] = 'exploration'
                 update['voucher']['amount'] = data['BaseValue'] + data['Bonus']
                 update['voucher']['valid'] = self.valid_voucher(update['voucher'])
 
             elif event == 'MarketSell':
                 log.debug('JournalMonitor found ' + event + '.')
-                update['voucher']['timestamp'] = data['timestamp'] #REVIEW
+                update['voucher']['timestamp'] = data['timestamp']
                 update['voucher']['amount'], update['voucher']['profit_made'] = self.determine_trade_profit(data['Count'], data['SellPrice'], data['AvgPricePaid'])
-                update['voucher']['commodity'] = data['Type']
-                try:
-                    if data['BlackMarket']: #True/False
+                #update['voucher']['commodity'] = data['Type']
+                traded = data['Type']
+                tonnes = data['Count']  #FIXME do something with tonnage
+
+                if 'BlackMarket' in data.keys(): #True/False
                         log.debug('JournalMonitor found black market trade.')
                         update['voucher']['type'] = 'smuggled'
                         update['voucher']['valid'] = self.valid_voucher(update['voucher'])
-                except:
+                else:
                     log.debug('JournalMonitor found legitimate market trade.')
                     update['voucher']['type'] = 'trade'
-                    update['voucher']['commodity'] = data['Type']
                     update['voucher']['valid'] = self.valid_voucher(update['voucher'])
                     pass
+                # Since we've now tested validity of the commodity against the state
+                # we can stomp the commodity traded into it's category
+                if traded in commodities.group['foods']:
+                    update['voucher']['commodity'] = 'Food'
+                elif traded in commodities.group['weapons']:
+                    update['voucher']['commodity'] = 'Weapons'
+                elif traded in commodities.group['medicines']:
+                    update['voucher']['commodity'] = 'Medicines'
+                else:
+                    update['voucher']['commodity'] = 'Misc'
 
             # send the data
             if len(update) >0:
@@ -1220,22 +1232,11 @@ class JournalMonitor(threading.Thread):
         will_decrease_duration = ''
         will_increase_duration = ''
         log.info('Determining validity of this voucher.')
-        food_commodities = ['aepyornisegg', 'albinoquechuamammothmeat', 'algae', 'animalmeat', 'anynacoffee', 'aroucaconventualsweets',
-                            'azuremilk', 'baltahsinevacuumkrill', 'bluemilk', 'cd-75kittenbrandcoffee', 'ceremonialheiketea', 'cetirabbits',
-                             'chieridanimarinepaste', 'coffee', 'coquimspongiformvictuals', 'deuringastruffles', 'disomacorn', 'edenapplesofaerial',
-                              'esusekucaviar', 'ethgrezeteabuds', 'fish', 'foodcartridges', 'fruitandvegetables', 'fujintea', 'giantirukamasnails',
-                               'gomanyauponcoffee', 'grain', 'haidneblackbrew', 'hip10175bushmeat', 'hipproto-squid', 'hr7221wheat', 'jarouarice',
-                                'karsukilocusts', 'livehecateseaworms', 'ltthypersweet', 'mechucoshightea', 'mokojingbeastfeast', 'mukusubiichitin-os',
-                                 'mulachigiantfungus', 'neritusberries', 'ochoengchillies', 'orrerianviciousbrew', 'sanumadecorativemeat', 'syntheticmeat',
-                                  'tanmarktranquiltea', 'tea', 'uszaiantreegrub', 'utgaroarmillennialeggs', 'voidextractcoffee', 'wheemetewheatcakes',
-                                   'witchhaulkobebeef'] #REVIEW may not be accurate
-        weapon_commodities = ['battleweapons', 'borasetanipathogenetics', 'gilyasignatureweapons', 'hip118311swarm', 'holvaduellingblades',
-                              'kamorinhistoricweapons', 'landmines', 'non-lethalweapons', 'personalweapons', 'reactivearmour'] #REVIEW may not be accurate
-        medicine_commodities = ['aganipperush', 'agri-medicines', 'alyabodysoap', 'basicmedicines', 'combatstabilisers', 'fujintea', 'honestypills',
-                                'kachiriginfilterleeches', 'pantaaprayersticks', 'performanceenhancers', 'progenitorcells', 'taurichimes', 'terramaterbloodbores',
-                                 'vherculisbodyrub', 'vegaslimweed', 'watersofshintara'] #REVIEW may not be accurate
 
-        state = runtime['target_faction_state']
+        state = runtime['target_faction_state'] # REVIEW not quite satisified with this...
+        log.debug(state)
+        log.debug(event['type'])
+        log.debug(str(event))
 
         if event['type'] == 'bounty' or event['type'] == 'CombatBond':
             if state in ['Elections', 'Famine', 'Outbreak']: #REVIEW confirm Elections type
@@ -1250,10 +1251,13 @@ class JournalMonitor(threading.Thread):
             if state in ['War', 'Civil War', 'Famine', 'Outbreak', 'Lockdown']:
                 reason = 'Mission completed for faction in state: {}'.format(state)
                 will_effect_influence = False
+            #elif event['influence'] == 'None':
+        #        reason = 'Mission completed with no influence reward.'      ## REVIEW FIXME Due to 3.0, mission rewards are
+        #        will_effect_influence = False                               # handled differently and may need to be rewritten
             else:
                 will_effect_influence = True
 
-        if event['type'] == 'exploration':
+        if event['type'] == 'exploration' or event['type'] == 'scannable':
             if state in ['Boom', 'Expansion', 'Investment']:
                 will_increase_duration = True
             elif state in ['Bust', 'Famine', 'Outbreak']:
@@ -1265,47 +1269,48 @@ class JournalMonitor(threading.Thread):
                 will_effect_influence = True
 
         if event['type'] == 'trade':
+            print(commodities.group['weapons'])
             if event['profit_made'] == True:
                 if state in ['Boom']:
                     will_increase_duration = True
                 elif state in ['Bust']:
                     will_decrease_duration = True
                 elif state in ['CivilUnrest']:   #REVIEW confirm CivilUnrest type
-                    if commodity in weapon_commodities:
+                    if commodity in commodity_group['weapons']:
                         will_increase_duration = True
                 elif state in ['Famine']:
-                    if commodity in food_commodities:
+                    if commodity in commodity_group['foods']:
                         will_decrease_duration = True
                 elif state in ['Outbreak']:
-                    if commodity in medicine_commodities:
+                    if commodity in commodity_group['medicines']:
                         will_decrease_duration = True
                 elif state in ['War', 'CivilWar', 'Lockdown']:
                     reason = 'Conducted normal trade for faction in state: {}'.format(state)
                     will_effect_influence = False
                 else:
                     will_effect_influence = True
-            else:
-                reason = 'Failed to make a profit'
-                will_effect_influence = False
+            # else:
+            #     reason = 'Failed to make a profit'
+            #     will_effect_influence = False
 
         if event['type'] == 'smuggled':
             if event['profit_made'] == True:
                 if state in ['CivilUnrest']:
-                    if commodity in weapon_commodities:
+                    if commodity in commodities.group['weapons']:
                         will_increase_duration = True
                 elif state in ['Famine']:
-                    if commodity in food_commodities:
+                    if commodity in commodities.group['foods']:
                         will_decrease_duration = True
                 elif state in ['Outbreak']:
-                    if commodity in medicine_commodities:
+                    if commodity in commodities.group['medicines']:
                         will_decrease_duration = True
                 elif state in ['Lockdown', 'CivilUnrest']: #REVIEW confirm CivilUnrest type
                     will_increase_duration = True
                 else:
                     will_effect_influence = True
-            else:
-                reason = 'Failed to make a profit'
-                will_effect_influence = False
+            # else:
+            #     reason = 'Failed to make a profit'
+            #     will_effect_influence = False
 
         if will_increase_duration:
             log.info('Determined this voucher will extend current state.')
