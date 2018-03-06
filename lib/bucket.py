@@ -2,37 +2,6 @@
 This is a bucket where I keep all the fat text variables.
 '''
 
-bugtext = '''
-This is a work in progress. The coder is lazy and terrible. Many mistakes were made. Oh god, the shame.
-
-If you can, please do the following:
-
-Step 1: Process any BGS data that actually worked because we're going to delete your database.
-Step 2: Close the companion.
-Step 3: Edit the 'settings.ini' in your Companion directory and change the LogLevel to 'debug' (without quotes)
-Step 4: Remove the 'companion.db' file under 'etc' in your Companion directory.
-Step 5: Re-run the companion - it will play back over the journal file, hopefully reproducing the issue, creating a nice big fat log.
-
-When it's done..
-
-Send Kalis a PM on discord, including:
-
-* Your OS, OS version (i.e Windows 10)
-* Details of what happened / How to reproduce the bug
-
-..attach the 'companion.log' file in your Companion directory to your report.
-
-Don't forget to change the 'settings.ini' back to 'info' as debug mode can get pretty spammy. And weird things happen.
-
-Note that if you can't be bothered, at least send the standard log file as it will at least give us a hint where to look.
-The standard logs are okay, but don't tell us too much.
-
-Sorry for the inconvenience!
-'''
-
-req_text = '''
-Hit up Kalis on discord.
-'''
 
 credtext = '''
 Cobbled together in a drunken haze by CMDR Kalis for Radio Sidewinder.

@@ -1,0 +1,4 @@
+{
+  "version": "0.9a",
+  "changelog": ["* Added options window and changed menu layout to accomodate", "* Anonymously sends updates to EDDN (enabled by default)", "* Users can now opt-out of checking for updates at start of every session", "* Updated some events for Elite: Beyond", "* Now shows mission influence counts in mission copy/paste info", "* Altered window behaviour - child windows now appear next to parent window", "* Some groundwork ot make future updates a bit more seamless (still WIP)"]
+}

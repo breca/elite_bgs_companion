@@ -19,7 +19,7 @@ def window_bgs(root, databroker, runtime):
 
     # Create a canvas, then a frame embedded into the canvas. Attach a scrollbar to the canvas
     # qv https://stackoverflow.com/questions/3085696/adding-a-scrollbar-to-a-group-of-widgets-in-tkinter
-    bgs_canvas = Canvas(bgs_win, width=600)
+    bgs_canvas = Canvas(bgs_win, width=730)
 
     bgs_vsb = Scrollbar( bgs_win, orient="vertical", command=bgs_canvas.yview)
     bgs_canvas.configure(yscrollcommand=bgs_vsb.set)
@@ -55,6 +55,7 @@ def window_bgs(root, databroker, runtime):
         # container for stoping our derived text from the below loop, for copying amounts to clipboard
         all_ids = []
 
+
         # REVIEW might not be needed since generation has moved to sql
         display_dict = {}
         display_dict = copy.deepcopy(dict(report_dict))
@@ -63,6 +64,26 @@ def window_bgs(root, databroker, runtime):
             for station in display_dict[system]:
                 for faction in display_dict[system][station]:
                     log.debug('Processing faction: ' + faction)
+
+                    # counts for mission influence
+                    count_mission_inf_none = 0
+                    count_mission_inf_low = 0
+                    count_mission_inf_med = 0
+                    count_mission_inf_high = 0
+
+                    # counts for number of transactions carried out
+                    count_bounty = 0
+                    count_combat = 0
+                    count_donation = 0
+                    count_loss_trade = 0    # trades at a loss (offensive BGS)
+                    count_low_trade = 0     # trades under 700 credit profit
+                    count_high_trade = 0    # trades above 700 credit profit
+                    count_mission = 0
+                    count_loss_smuggling = 0  # as above but for sneaky trades
+                    count_low_smuggling = 0
+                    count_high_smuggling = 0
+                    count_exploration = 0
+
                     fact_lbl = Label(bgs_frame, text=faction, padx=3, pady=3, borderwidth=1, relief='ridge', anchor=W, font = "Verdana 10 bold")
                     fact_lbl.grid(row=rows, column=0, columnspan=9, padx=3, pady=3, sticky=E+W)
                     rows+=1
@@ -101,6 +122,7 @@ def window_bgs(root, databroker, runtime):
                             bounty_ids = display_dict[system][station][faction][transaction]['bounty'][-1]
                             for f in bounty_ids:
                                 all_ids.append(f)
+                                count_bounty += 1
                         except KeyError:
                             r_bounty = 0
                             bounty_ids = False
@@ -111,6 +133,7 @@ def window_bgs(root, databroker, runtime):
                             combat_ids = display_dict[system][station][faction][transaction]['CombatBond'][-1]
                             for f in combat_ids:
                                 all_ids.append(f)
+                                count_combat += 1
                         except KeyError:
                             r_combat = 0
                             combat_ids = False
@@ -122,6 +145,7 @@ def window_bgs(root, databroker, runtime):
                                 donation_ids = display_dict[system][station][faction][transaction]['donation'][-1]
                                 for f in donation_ids:
                                     all_ids.append(f)
+                                    count_donation += 1
                         except KeyError as e:
                             log.exception('Failed to add donations to window', e)
                             donation = 0
@@ -134,7 +158,13 @@ def window_bgs(root, databroker, runtime):
                                 trade_ids = display_dict[system][station][faction][transaction]['trade'][-1]
                                 for f in trade_ids:
                                     all_ids.append(f)
-                                commodities = ', '.join(display_dict[system][station][faction][transaction]['trade'][1])
+                                    if r_trade < 0:
+                                        count_loss_trade += 1
+                                    elif r_trade > 1 and r_trade < 700:
+                                        count_low_trade += 1
+                                    elif r_trade >= 700:
+                                        count_high_trade += 1
+                                commodities = ', '.join(display_dict[system][station][faction][transaction]['trade'][1]) ##FIXME need to be in categories
                         except KeyError as e:
                             log.exception('Failed to add trade to window', e)
                             trade = 0
@@ -146,8 +176,22 @@ def window_bgs(root, databroker, runtime):
                                 r_mission = display_dict[system][station][faction][transaction]['mission'][0]
                                 mission = '{:,}'.format(r_mission)
                                 mission_ids = display_dict[system][station][faction][transaction]['mission'][-1]
+                                mission_inf =  display_dict[system][station][faction][transaction]['mission'][1][0]
+                                print(mission_inf)
                                 for f in mission_ids:
                                     all_ids.append(f)
+                                    if mission_inf == 'None':
+                                        count_mission_inf_none += 1  # Missions should never make it this far but eh
+                                    elif mission_inf == 'Low':
+                                        count_mission_inf_low += 1
+                                    elif mission_inf == 'Med':
+                                        count_mission_inf_med += 1
+                                    elif mission_inf == 'High':
+                                        count_mission_inf_high += 1
+                                    else:
+                                        # Should never happen
+                                        log.error('Found a mission whose influence has been reported differently for some reason: {}'.format(display_dict[system][station][faction][transaction]['mission']))
+                                    print(count_mission_inf_med)
                         except KeyError:
                             mission = 0
                             mission_ids = False
@@ -159,7 +203,13 @@ def window_bgs(root, databroker, runtime):
                                 smuggling_ids = display_dict[system][station][faction][transaction]['smuggled'][-1]
                                 for f in smuggling_ids:
                                     all_ids.append(f)
-                                commodities = ', '.join(display_dict[system][station][faction][transaction]['smuggled'][1])
+                                    if r_smuggling < 0:
+                                        count_loss_smuggling += 1
+                                    elif r_smuggling > 1 and r_smuggling < 700:
+                                        count_low_smuggling += 1
+                                    elif r_smuggling >= 700:
+                                        count_high_smuggling += 1
+                                commodities = ', '.join(display_dict[system][station][faction][transaction]['smuggled'][1]) ##FIXME need to be in categories
                         except KeyError:
                             smuggling = 0
                             commodities = ''
@@ -170,6 +220,7 @@ def window_bgs(root, databroker, runtime):
                             exploration_ids = display_dict[system][station][faction][transaction]['exploration'][-1]
                             for f in exploration_ids:
                                 all_ids.append(f)
+                                count_exploration += 1
                             exploration = '{:,}'.format(r_exploration)
                         except KeyError:
                             exploration_ids = False
@@ -184,35 +235,76 @@ def window_bgs(root, databroker, runtime):
                         stat = Label(bgs_frame, text=station, padx=3, pady=3)
                         stat.grid(row=rows, column=1, padx=3, pady=3)
 
-                        but_bounty = '{} > Bounties {}'.format(bounty, report_line)
-                        lbl1 = Button(bgs_frame, text=bounty, borderwidth=1, relief='sunken', padx=10, pady=3, command=lambda j=but_bounty: copy_to_clipboard(bgs_win, j))
-                        lbl1.grid(row=rows, column=2, padx=3, pady=3, sticky=NSEW)
+                        if count_bounty > 0:
+                            if count_bounty > 1:
+                                but_bounty = '{} > Bounties ({} Transactions) {}'.format(bounty, count_bounty, report_line)
+                            else:
+                                but_bounty = '{} > Bounties ({} Transaction) {}'.format(bounty, count_bounty, report_line)
+                            lbl1 = Button(bgs_frame, text=bounty, borderwidth=1, relief='sunken', padx=10, pady=3, command=lambda j=but_bounty: copy_to_clipboard(bgs_win, j))
+                            lbl1.grid(row=rows, column=2, padx=3, pady=3, sticky=NSEW)
 
-                        but_combat = '{} > Combat {}'.format(combat, report_line)
-                        lbl2 = Button(bgs_frame, text=combat, borderwidth=1, relief='sunken', padx=10, pady=3, command=lambda j=but_combat: copy_to_clipboard(bgs_win, j))
-                        lbl2.grid(row=rows, column=3, padx=3, pady=3, sticky=NSEW)
+                        if count_combat > 0:
+                            if count_combat > 1:
+                                but_combat = '{} > Combat ({} Transactions) {}'.format(combat, count_combat, report_line)
+                            else:
+                                but_combat = '{} > Combat ({} Transaction) {}'.format(combat, count_combat, report_line)
+                            lbl2 = Button(bgs_frame, text=combat, borderwidth=1, relief='sunken', padx=10, pady=3, command=lambda j=but_combat: copy_to_clipboard(bgs_win, j))
+                            lbl2.grid(row=rows, column=3, padx=3, pady=3, sticky=NSEW)
 
-                        but_donate = '{} > Donations {}'.format(donation, report_line)
-                        lbl3 = Button(bgs_frame, text=donation, borderwidth=1, relief='sunken', padx=10, pady=3, command=lambda j=but_donate: copy_to_clipboard(bgs_win, j))
-                        lbl3.grid(row=rows, column=4, padx=3, pady=3, sticky=NSEW)
+                        if count_donation > 0:
+                            if count_donation > 1:
+                                but_donate = '{} > Donations ({} Transactions) {}'.format(donation, count_donation, report_line)  #FIXME need to track influence
+                            else:
+                                but_donate = '{} > Donations ({} Transaction) {}'.format(donation, count_donation, report_line)  #FIXME need to track influence
+                            lbl3 = Button(bgs_frame, text=donation, borderwidth=1, relief='sunken', padx=10, pady=3, command=lambda j=but_donate: copy_to_clipboard(bgs_win, j))
+                            lbl3.grid(row=rows, column=4, padx=3, pady=3, sticky=NSEW)
 
-                        but_mission = '{} > Missions {}'.format(mission, report_line)
-                        lbl4 = Button(bgs_frame, text=mission, borderwidth=1, relief='sunken', padx=10, pady=3, command=lambda j=but_mission: copy_to_clipboard(bgs_win, j))
-                        lbl4.grid(row=rows, column=5, padx=3, pady=3, sticky=NSEW)
+                        if count_mission_inf_low > 0 or count_mission_inf_med > 0 or count_mission_inf_high > 0:
+                            but_mission = '{} > Missions ('.format(mission)
+                            if count_mission_inf_low > 0:
+                                but_mission = but_mission + ' Low: {}'.format(str(count_mission_inf_low))
+                            if count_mission_inf_med > 0:
+                                but_mission = but_mission + ' Med: {}'.format(str(count_mission_inf_med))
+                            if count_mission_inf_high > 0:
+                                but_mission = but_mission + ' High: {}'.format(str(count_mission_inf_high))
+                            but_mission = but_mission + ' ) {}'.format(report_line)
+                            lbl4 = Button(bgs_frame, text=mission, borderwidth=1, relief='sunken', padx=10, pady=3, command=lambda j=but_mission: copy_to_clipboard(bgs_win, j))
+                            lbl4.grid(row=rows, column=5, padx=3, pady=3, sticky=NSEW)
 
-                        but_trade = '{} > Trade ({}) {}'.format(trade, commodities, report_line)
-                        lbl3 = Button(bgs_frame, text=trade, borderwidth=1, relief='sunken', padx=10, pady=3, command=lambda j=but_trade: copy_to_clipboard(bgs_win, j))
-                        lbl3.grid(row=rows, column=6, padx=3, pady=3, sticky=NSEW)
+                        if count_loss_trade > 0 or count_low_trade > 0 or count_high_trade > 0:
+                            but_trade = '{} > Traded ('.format(trade)   ##FIXME need to be in categories
+                            if count_loss_trade > 0:
+                                but_trade = but_trade + ' Losses: {}'.format(str(count_loss_trade))
+                            if count_low_trade > 0:
+                                but_trade = but_trade + ' Low: {}'.format(str(count_low_trade))
+                            if count_high_trade > 0:
+                                but_trade = but_trade + ' High: {}'.format(str(count_high_trade))
+                            but_trade = but_trade + ' ), Types ({}) {}'.format(commodities, report_line)
+                            lbl3 = Button(bgs_frame, text=trade, borderwidth=1, relief='sunken', padx=10, pady=3, command=lambda j=but_trade: copy_to_clipboard(bgs_win, j))
+                            lbl3.grid(row=rows, column=6, padx=3, pady=3, sticky=NSEW)
 
-                        but_smuggling = '{} > Smuggling ({}) {}'.format(smuggling, commodities, report_line)
-                        lbl4 = Button(bgs_frame, text=smuggling, borderwidth=1, relief='sunken', padx=10, pady=3, command=lambda j=but_smuggling: copy_to_clipboard(bgs_win, j))
-                        lbl4.grid(row=rows, column=7, padx=3, pady=3, sticky=NSEW)
+                        if count_loss_smuggling > 0 or count_low_smuggling > 0 or count_high_smuggling > 0:
+                            but_smuggling = '{} > Smuggled ('.format(smuggling)   ##FIXME need to be in categories
+                            if count_loss_smuggling > 0:
+                                but_smuggling = but_smuggling + ' Losses: {}'.format(str(count_loss_smuggling))
+                            if count_low_smuggling > 0:
+                                but_smuggling = but_smuggling + ' Low: {}'.format(str(count_low_smuggling))
+                            if count_high_smuggling > 0:
+                                but_smuggling = but_smuggling + ' High: {}'.format(str(count_high_smuggling))
+                            but_smuggling = but_smuggling + ' ), Types ({}) {}'.format(commodities, report_line)
+                            lbl4 = Button(bgs_frame, text=smuggling, borderwidth=1, relief='sunken', padx=10, pady=3, command=lambda j=but_smuggling: copy_to_clipboard(bgs_win, j))
+                            lbl4.grid(row=rows, column=7, padx=3, pady=3, sticky=NSEW)
 
-                        but_exploration = '{} > Exploration Data {}'.format(exploration, report_line)
-                        lbl5 = Button(bgs_frame, text=exploration, borderwidth=1, relief='sunken', padx=10, pady=3, command=lambda j=but_exploration: copy_to_clipboard(bgs_win, j))
-                        lbl5.grid(row=rows, column=8, padx=3, pady=3, sticky=NSEW)
+                        if count_exploration > 0:
+                            if count_exploration > 1:
+                                but_exploration = '{} > Exploration Data ({} Transactions) {}'.format(exploration, count_exploration, report_line)
+                            else:
+                                but_exploration = '{} > Exploration Data ({} Transaction) {}'.format(exploration, count_exploration, report_line)
+                            lbl5 = Button(bgs_frame, text=exploration, borderwidth=1, relief='sunken', padx=10, pady=3, command=lambda j=but_exploration: copy_to_clipboard(bgs_win, j))
+                            lbl5.grid(row=rows, column=8, padx=3, pady=3, sticky=NSEW)
 
                         rows+=1
+
             clr_btn = Button(bgs_frame, text='Clear All and Exit', borderwidth=1, padx=10, pady=5, command=lambda: [bgs_empty(all_ids, databroker),bgs_win.destroy()])
             clr_btn.grid(row=rows+1, column=0, columnspan=9, padx=3, pady=3, sticky=S)
 
