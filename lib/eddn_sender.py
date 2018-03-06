@@ -69,20 +69,20 @@ class EDDN_dispatcher(threading.Thread):
             # if there's more than 30 seconds between them, ignore
             timestamp_drift = timestamp_now - timestamp_file
 
-            log.debug('EDDN Dispatcher calculated data timestamp drift between json and realtime for Shipyard.json: {}'.format(timestamp_drift.total_seconds())) #DEBUG
+            #log.debug('EDDN Dispatcher calculated data timestamp drift between json and realtime for Shipyard.json: {}'.format(timestamp_drift.total_seconds())) #DEBUG
             if not timestamp_drift.total_seconds() > 5:
                 # Check to see if this data matches data previously stored in this class
                 if hasattr(self, 'old_shipyard_lines'):
                     if self.old_shipyard_lines == _json:
-                        log.debug('EDDN Dispatcher has already processed this Shipyard.json. Ignoring.')
+                        #log.debug('EDDN Dispatcher has already processed this Shipyard.json. Ignoring.')
                         return
                 else:
                     # We'll store the json, just to try and ensure we don't double up or spam data
                     self.old_shipyard_lines = _json
                     # Construct and send the payload
                     self.send_shipyard(_json)
-            else:
-                log.debug('EDDN Dispatcher found stale Shipyard data.')
+            #else:
+                #log.debug('EDDN Dispatcher found stale Shipyard data.')
         except Exception as e:
             log.exception('EDDN Dispatcher encountered error trying to post Shipyard data.', e)
             pass
@@ -104,20 +104,20 @@ class EDDN_dispatcher(threading.Thread):
             # if there's more than 30 seconds between them, ignore
             timestamp_drift = timestamp_now - timestamp_file
 
-            log.debug('EDDN Dispatcher calculated data timestamp drift between json and realtime for Outfitting.json: {}'.format(timestamp_drift.total_seconds())) #DEBUG
+            #log.debug('EDDN Dispatcher calculated data timestamp drift between json and realtime for Outfitting.json: {}'.format(timestamp_drift.total_seconds())) #DEBUG
             if not timestamp_drift.total_seconds() > 5:
                 # Check to see if this data matches data previously stored in this class
                 if hasattr(self, 'old_outfitting_lines'):
                     if self.old_outfitting_lines == _json:
-                        log.debug('EDDN Dispatcher has already processed this Outfitting.json. Ignoring.')
+                        #log.debug('EDDN Dispatcher has already processed this Outfitting.json. Ignoring.')
                         return
                 else:
                     # We'll store the json, just to try and ensure we don't double up or spam data
                     self.old_outfitting_lines = _json
                     # Construct and send the payload
                     self.send_outfitting(_json)
-            else:
-                log.debug('EDDN Dispatcher found stale Outfitting data.')
+            # else:
+            #     log.debug('EDDN Dispatcher found stale Outfitting data.')
         except Exception as e:
             log.exception('EDDN Dispatcher encountered error trying to post Outfitting data.', e)
             pass
@@ -139,20 +139,20 @@ class EDDN_dispatcher(threading.Thread):
             # if there's more than 30 seconds between them, ignore
             timestamp_drift = timestamp_now - timestamp_file
 
-            log.debug('EDDN Dispatcher calculated data timestamp drift between json and realtime for Market.json: {}'.format(timestamp_drift.total_seconds())) #DEBUG
+            #log.debug('EDDN Dispatcher calculated data timestamp drift between json and realtime for Market.json: {}'.format(timestamp_drift.total_seconds())) #DEBUG
             if not timestamp_drift.total_seconds() > 5:
                 # Check to see if this data matches data previously stored in this class
                 if hasattr(self, 'old_market_lines'):
                     if self.old_market_lines == _json:
-                        log.debug('EDDN Dispatcher has already processed this Market.json. Ignoring.')
+                        #log.debug('EDDN Dispatcher has already processed this Market.json. Ignoring.')
                         return
                 else:
                     # We'll store the json, just to try and ensure we don't double up or spam data
                     self.old_market_lines = _json
                     # Construct and send the payload
                     self.send_market(_json)
-            else:
-                log.debug('EDDN Dispatcher found stale Market data.')
+            #else:
+                #log.debug('EDDN Dispatcher found stale Market data.')
         except Exception as e:
             log.exception('EDDN Dispatcher encountered error trying to post Market data.', e)
             pass
