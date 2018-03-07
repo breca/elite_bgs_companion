@@ -74,6 +74,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ## Changelog:
  * Version 0.91a Hotfix
+ 
  	Fixes for data points/surface data point vouchers.
 	
 	Fixed Combat bonds being assigned the wrong faction.
