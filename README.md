@@ -4,7 +4,7 @@
 
 ![Carte Blanc Edition](https://i.imgur.com/cpI2vzF.png)
 
-## Current Version: 0.9a
+## Current Version: 0.91a
 
 This application parses the player's journal file and extracts
 information that pertains to the Elite Dangerous background simulation.
@@ -73,6 +73,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ## Changelog:
+ * Version 0.91a Hotfix
+ 	Fixes for data points/surface data point vouchers.
+	
+	Fixed Combat bonds being assigned the wrong faction.
+
  * Version 0.9a
  	Updated some events for Elite: Beyond.
 	
