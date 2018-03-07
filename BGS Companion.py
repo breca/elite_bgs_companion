@@ -474,7 +474,7 @@ def voucher_tracker(update, msg_queue):
             # elif update['voucher']['type'] == 'CombatBond':
             #     msg_type = 'redeemed combat bonds worth'
             else:
-                if update['voucher']['type'] == 'scannable':
+                if update['voucher']['type'] == 'scannable' or update['voucher']['type'] == 'settlement':
                     msg_type = 'redeemed data worth'
                     nice_amount = str('{:,}'.format(update['voucher']['factions'][0][-1]))
                 if update['voucher']['type'] == 'exploration':
@@ -504,7 +504,7 @@ def voucher_tracker(update, msg_queue):
                     end_msg = 'You {} {} credits for {} at {} in the {} system.'.format(msg_type, nice_amount, runtime['station_faction'], runtime['station_name'], runtime['star_system'])
 
                 #trade credits are handled seperately
-                if update['voucher']['type'] not in ['trade', 'smuggle', 'scannable']:
+                if update['voucher']['type'] not in ['trade', 'smuggle', 'scannable', 'settlement']:
                     runtime['credits'] += update['voucher']['amount']
 
         if 'mission' in update.keys():
@@ -1119,9 +1119,10 @@ class JournalMonitor(threading.Thread):
                             else:
                                 update['voucher']['factions'].append([f['Faction'],f['Amount']])
                                 faction_no +=1
+                elif 'Faction' in data.keys():
+                    update['voucher']['factions'].append([data['Faction'], data['Amount']])
                 else:
                     update['voucher']['factions'].append([runtime['station_faction'], data['Amount']])
-                    #update['voucher']['factions'].append([data['Faction'], data['Amount']])  ##REVIEW this seems wrong, try above
                 update['voucher']['valid'] = self.valid_voucher(update['voucher'])
 
             # filter missions out from donations
@@ -1320,7 +1321,10 @@ class JournalMonitor(threading.Thread):
             result = 'decrease'
         elif not will_effect_influence:
             log.info('Determined this voucher is invalid (will not effect influence).')
-            log.info('Reason: {}'.format(reason))
+            if 'reason' in locals(): ##FIXME should always have a reason..
+                log.info('Reason: {}'.format(reason))
+            else:
+                log.error('Voucher {} did not specify a reason as to why it does not affect influence!'.format(str(event)))
             result = 'invalid'
         else:
             log.info('Determined this voucher is valid.')
