@@ -50,7 +50,7 @@ a new one, it will start parsing that.
 
 There is no authentication taking place here, this is all local. 
 Block the application in your firewall if you're feeling paranoid.
-Only data currently transmitted is for checking for updates.
+Only data currently transmitted is for checking for updates and EDDN.
 All that being said, use at your own risk, if this turns your PC into
 molten slag, deletes all your cherished family photos, gives you brain
 damage or makes you insult your grandmother, that's on you.
