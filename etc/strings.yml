@@ -1,0 +1,175 @@
+# Commander welcome flavour text.
+# This is a prefix to the Commander's name
+welcomes:
+  - "Welcome, Commander "
+  - "Good to see you, Commander "
+  - "Commander "
+  - "Lets get to work, Commander "
+  - "Praise the Signal, it's Commander "
+
+window:
+  bgs:
+    no_results: "There's nothing to show! Go earn for the Crew!"
+
+
+# Text in credit window
+credits: |
+  Cobbled together in a drunken haze by CMDR Kalis for Radio Sidewinder.
+
+  Special thanks to:
+  CMDR Yojimbosan for code contributions, 9th dan black-belt bug reporting-fu and hosting.
+  CMDR Choopsha for thorough testing and feedback from inception.
+  Thanks to CMDR Azrael Nixx, CMDR R.Sharpe for being willing test bunnies.
+
+# Text used for BGS advisor
+# In systems where your faction has a presence, you will see 'defence' strings displayed
+# in the app. The string is a suffix to your faction (defined in bgs.yml)
+# i.e Radio Sidewinder is in famine, blah blah.
+#
+# Offensive strings in foreign systems are a bit different.
+# If there is an ENEMY faction (defined in bgs.yml) then it will be presented first (even if it isn't in a state).
+# If there are no enemies, it will advise on the owning faction. If they're not in a state, the next
+# largest faction is used. Again, the string is a suffix - 'Liberal Party of Whatevs are booming,
+# go trade illegal goods!'
+
+# Famine conditions
+famine_defence: " is experiencing a famine!\nTrade/Smuggle Food or supply exploration data to help out."
+famine_flavour_defence:
+  - "I'll take a half pepperoni, half margarita."
+  - "Pick me up a soda, too."
+  - "How much room do you need to grow fungi? As mushroom as possible."
+  - "Have you eaten today?"
+  - "What if soy milk is just regular milk introducing itself in Spanish?"
+  - "A burger sounds great right now."
+famine_offence: " is experiencing a famine!\nTarget distribution centers and other aid sites to starve them out."
+famine_flavour_offence:
+  - "Food is the new smoking anyway."
+  - "They can afford to lose a few pounds."
+
+# Unrest conditions
+unrest_defence: " is experiencing Civil Unrest here.\nRedeem combat bonds or bounty hunt to help restore order."
+unrest_flavour_defence:
+  - "Where are the cops when you need them?"
+  - "Time to play cops and robbers."
+  - "It's clobbering time(TM)!"
+  - "Don't forget your badge and gun."
+  - "I AM the law!"
+  - "..and to think I was two days from retirement."
+  - "Don't drop your donut."
+  - "Hide yo' kids, hide yo' - EXCEPTION: ai_colloquial_subroutine.is_failed: $SIGNIFICANT_OTHER not found."
+  - "Hide yo' kids, hide yo' wife!"
+unrest_offence: " is in unrest!\nWhy not take this opportunity to trade some weapons? Perhaps help out a few misunderstood pilots?"
+unrest_flavour_offence:
+  - "Don't let the MAN get you down!"
+  - "Words have officially stopped working!"
+  - "Some see anarchy, some see opportunity!"
+  - "Hide yo' kids, hide yo' - EXCEPTION: ai_colloquial_subroutine.is_failed: $SIGNIFICANT_OTHER not found."
+  - "Hide yo' kids, hide yo' wife!"
+  - "It's clobbering time(TM)!"
+
+# Boom conditions
+boom_defence: " is BOOMING!\nGreat for trading and a nice place to sell exploration data. Don't trade on the black market here, though."
+boom_flavour_defence:
+  - "Makin' Bacon."
+  - "Show me the money!"
+  - "Shut up and take my commodities!"
+  - "BUY! BUY! No, SELL! SELL!"
+  - "Is the bank of Zaonce too big to fail?"
+  - "Bulls make money, bears make money, pigs get slaughtered."
+  - "The easiest way to make a million credits on a trade is to start with two million."
+  - "The trend is your friend."
+boom_offense: " is booming. Show them the meaning of free markets and smuggle some goods. Or blow things up."
+boom_flavour_offence:
+  - "Hey kids, who wants a gun?!"
+  - "Narcotics! Get your Narcotics here!"
+  - "I hear these guys LOVE toxic waste."
+  - "You know what goes great with this car? A boot full of slaves."
+
+# War conditions
+war_defence: " is at war here.\nRedeem combat bonds or bounty hunt to increase our influence in this system."
+war_flavour_defence:
+  - "If you're not here to win it, you're in the wrong place."
+  - "I love the smell of hydrogen fuel in the morning."
+  - "Show me your war face!"
+  - "Your faction needs you!"
+  - "I want YOU\nfor the RSC Navy!"
+  - "Let me hear your battle cry!"
+  - "What are you waiting for? Those medals don't earn themselves."
+  - "Signal save us all."
+war_offense: " is at war here.\n."
+war_offense_faction_present: " is at war here.\nLets show them not to mess with us!"
+war_flavour_offence:
+  - "Let me hear your battle cry!"
+  - "What are you waiting for? Those medals don't earn themselves."
+  - "I want YOU\nfor the RSC Navy!"
+  - "If you're not here to win it, you're in the wrong place."
+  - "I love the smell of hydrogen fuel in the morning."
+  - "Show me your war face!"
+
+# Outbreak conditions
+outbreak_defence: " is having an outbreak in this system!\nTrade/Smuggle Medicines and supply Exploration data to help out."
+outbreak_flavour_defence:
+  - "*cough*"
+  - "*wheeze*"
+  - "Signal protect us."
+  - "Could I get a tissue as well?"
+  - "Hope you've had your Vitamin C."
+  - "Probably get yourself checked while you're here."
+  - "They think this is bad? Wait until they find out about Space Madness."
+  - "Poor buggers."
+  - "I had a virus once myself. But enough about my love life."
+outbreak_offense: "STUB"
+outbreak_flavour_offence:
+  - "STUB"
+
+# Retreat conditions
+retreat_defence: " is in retreat!\nDo anything you can to re-establish our influence here."
+retreat_flavour_defence:
+  - "No, really, anything helps."
+  - "Don't let the signal die!"
+retreat_offense: "STUB"
+retreat_flavour_offence:
+  - "STUB"
+
+# Election conditions
+election_defence: " is taking part in an election in this system.\nTry to help out however you like, but leave your guns holstered, combat actions won't help here."
+election_flavour_defence:
+  - "Ho-hum."
+  - "Too much red tape for me."
+  - "Did you vote today?"
+  - "Perhaps a few tonnes of tea will speed things along?"
+election_offense: "STUB"
+election_flavour_offence:
+  - "STUB"
+
+# Expansion conditions
+expansion_defence: " is expanding to another system.\nDo anything you like to help, but exploration data is especially nice."
+expansion_flavour_defence:
+  - "Dust off your scanner array."
+  - "Honestly this is a good problem to have."
+  - "Hey, can you help me pack?"
+expansion_offense: "STUB"
+expansion_flavour_offence:
+  - "STUB"
+
+# Investment conditions
+investment_defence: " is promoting investment here so they can expand to another system.\nDo anything you like to help, but exploration data is especially nice."
+investment_flavour_defence:
+  - "Dust off your scanner array."
+  - "Honestly this is a good problem to have."
+  - "Hey, can you help me pack?"
+investment_offense: "STUB"
+investment_flavour_offence:
+  - "STUB"
+
+# Lockdown conditions
+lockdown_defence: " is in lockdown here!\nRedeem combat bounties here to help lift the lockdown."
+lockdown_flavour_defence:
+  - "I can't even use the mission computer here."
+  - "Your faction needs you!"
+  - "I hope this is just paranoia."
+  - "Perhaps someone just lost their keys?"
+lockdown_offense: "STUB"
+lockdown_flavour_offence:
+  - "STUB"
+

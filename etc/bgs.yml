@@ -1,0 +1,66 @@
+# Faction disposition
+my_faction: Radio Sidewinder Crew
+allied_factions:
+  - Radio Sidewinder Galactic
+enemy_factions:
+  - Poo Poo Crew
+#
+# BGS report formatting
+#
+# Here you can configure how your report string is formatted when it gets copied to the clipboard.
+# The default is...
+# $value > $type > $faction > $station > $system
+# Which would generate the following...
+# 1,876,234 > Combat Bonds > Blah > Spacey Ring > Sol
+# NOTE: If you want to use a literal '$' in your string, use '$$' instead.
+bgs_string: $value > $type > $faction > $station > $system
+
+# "Types" allows you to change how the transaction types are presented.
+# Each list/array element is appended to the first entry
+# At least one line must be present
+#
+# For example, if you wanted to make this less verbose, you could remove the
+# '$transactions' line.
+#
+# TODO list valid types
+
+types:
+  bounty:
+    start_field: 'Bounties: $amount'
+    kills: ' ($kills kills),'
+    transaction_count: ' $transactions transactions'
+    cmdr_report: '[CMDRs: $cmdr_count $cmdr_names]'  # Will only appear if CMDRs kills were scored
+    end_field:
+
+  combat_bonds:
+    start_field: 'Combat Bonds: $amount'
+    kills: ' ($kills kills),'
+    transaction_count: ' $transactions transactions'
+    end_field:
+
+  crime:
+    start_field: 'Fines accrued: $amount'
+    kills: ' ($kills kills),'
+    cmdr_report: '[CMDRs: $cmdr_count $cmdr_names]'  # Will only appear if CMDRs kills were scored
+    assaults: ' ($assault assaults),'
+    misc: ' ($misc other crimes)'
+    end_field:
+
+  donations:
+    start_field: 'Donations: $amount in '
+    transaction_count: ' $transactions transactions'
+    end_field:
+
+  mission:
+    start_field: 'Missions: $amount ('
+    completed:
+      high: ' $m_high high '
+      med: ' $m_high high '
+      low: ' $m_low low '
+    abandoned: ' $m_dumped dropped '
+    end_field: ')'
+
+  exploration:
+    start_field: 'Exploration: $amount in '
+    transaction_count: ' $transactions transactions'
+    end_field:

@@ -1,0 +1,13 @@
+icon: "images\\favicon.ico"
+logo: "images\\badge.png"
+
+titles:
+  main: "RSC Companion"
+  settings: "Companion Settings"
+  credits: "Credits"
+  bgs: "BGS Report"
+
+menu:
+  radio: "Hear the Signal"
+  affiliate: "Buy Skins"
+  donate: "Donate to RSC"

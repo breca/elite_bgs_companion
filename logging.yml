@@ -1,0 +1,22 @@
+formatters:
+  standard:
+    format: "%(asctime)s [%(threadName)-12.12s] [%(funcName)-12.12s] [%(levelname)-5.5s]: %(message)s"
+handlers:
+  stream:
+    class: logging.StreamHandler
+    formatter: standard
+    level: DEBUG
+  file:
+    class: logging.handlers.RotatingFileHandler
+    formatter: standard
+    level: DEBUG
+    filename: 'Companion.log'
+    maxBytes: 10240000
+    backupCount: 3
+loggers:
+  '':
+    handlers: [stream, file]
+    level: DEBUG
+    propagate: true
+version: 1
+disable_existing_loggers: False

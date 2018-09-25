@@ -1,0 +1,12 @@
+# Distribution URL for fetching updates
+distribution: https://ed.inode.co.nz/kalis/RSC_Companion.zip
+
+# Web reachable json containing current version/update notes
+version_check: https://ed.inode.co.nz/kalis/bgs_version.json
+
+# In-app links
+radio: https://www.radiosidewinder.com/listen-now/
+donate: https://www.radiosidewinder.com/donate/
+skins: https://www.radiosidewinder.com/shipskins/
+feature_request: https://www.google.com
+bug_report: https://www.google.com

@@ -1,0 +1,21 @@
+# Toggle True/False to enable/disable functionality
+
+# Menus
+main:
+  settings: True
+  feature_request: True
+  bug_report: True
+  credits: True
+
+# Toolbars
+timezones: True
+radio: True
+donate: True
+affiliate: True
+
+# Main screen
+clock_local: True
+clock_server: True
+countdown_influence: True
+countdown_board: True
+status_updates: True

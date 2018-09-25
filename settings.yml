@@ -1,0 +1,2 @@
+{check_updates_on_start: true, eddn_enabled: false, ignoring_updates: false, log_level: debug,
+  show_advisor: true}
