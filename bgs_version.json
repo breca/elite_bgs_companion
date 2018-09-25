@@ -1,4 +1,4 @@
 {
-  "version": "0.91a",
-  "changelog": ["* Fixes for data points/surface data point vouchers.", "* Fixed Combat bonds being assigned the wrong faction"]
+  "version": "0.92a",
+  "changelog": ["* Fixes hard-coded journal paths"]
 }
