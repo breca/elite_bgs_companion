@@ -4,7 +4,7 @@
 
 ![Carte Blanc Edition](https://i.imgur.com/cpI2vzF.png)
 
-## Current Version: 0.92a
+## Current Version: 0.93a (Development)
 
 This application parses the player's journal file and extracts
 information that pertains to the Elite Dangerous background simulation.
@@ -73,10 +73,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ## Changelog:
+
+ * Version 0.93a
+
+    BGS Report / Timezone window now updates dynamically.
+    
+    Added support for allied / enemy factions
+    
+    Better support for Offensive BGS reports
+
+    Massive code refactor.
+    
+    Changed database schema and access methods to hopefully suck less.
+   
+    Wings can now customise application strings / menus / windows / output easier.
+ 
  * Version 0.92a
  
- 	Fixes hard-coded journal links.
-	
+    Fixes hard-coded journal links.
+
  * Version 0.91a Hotfix
  
  	Fixes for data points/surface data point vouchers.
