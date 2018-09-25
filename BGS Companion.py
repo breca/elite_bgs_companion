@@ -87,7 +87,7 @@ def main():
                'location': '',
                'in_srv': '',
                'jump_type': '',
-               'journal_path': path.join('C:\\Users\\' + environ.get("USERNAME") + '\\Saved Games\\Frontier Developments\\Elite Dangerous'),
+               'journal_path': path.join(environ.get("USERPROFILE") + '\\Saved Games\\Frontier Developments\\Elite Dangerous'),
                'journal_file': '',
                'journal_byte_offset': 0
                }
