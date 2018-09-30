@@ -4,7 +4,7 @@
 
 ![Carte Blanc Edition](https://i.imgur.com/cpI2vzF.png)
 
-## Current Version: 0.92a
+## Current Version: 0.93a
 
 This application parses the player's journal file and extracts
 information that pertains to the Elite Dangerous background simulation.
@@ -73,6 +73,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ## Changelog:
+	NOTE This branch is horrible and on life support. If you want to
+	contribute, please use the development branch.
+
+ * Version 0.93a
+ 
+	Hopefully fixes clock based CTD
+
  * Version 0.92a
  
  	Fixes hard-coded journal links.
