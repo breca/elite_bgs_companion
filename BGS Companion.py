@@ -182,7 +182,7 @@ def main():
     # influence tick countdown
     tick_countdown = Label(root)
     tick_countdown.grid(column=0, columnspan=2, row=12, sticky=W+E)
-    tick_server()
+    tick_server(config)
 
     '''-----------------------------------------'''
 
@@ -565,87 +565,74 @@ def time_server():
 
 # board countdown timer for main window
 def tick_board():
-    time = dt.datetime.utcnow()
-    ticks = [00,15,30,45] #Boards refresh every 15 minutes
+    utc = dt.datetime.utcnow()
+    discard = dt.timedelta(minutes=utc.minute % 15,
+                        seconds=utc.second,
+                        microseconds=utc.microsecond)
+    # Get time until next interval
+    rounded = utc - discard
+    if discard <= dt.timedelta(minutes=15):
+        rounded += dt.timedelta(minutes=15)
+    final = rounded - utc
+    seconds_total = final.total_seconds()
+    minutes = int((seconds_total % 3600) / 60)
+    seconds = int(seconds_total % 60)
 
-    for tick in ticks:
-        tick_time = time.replace(minute=tick, second=0)
-        remainder = tick_time - time
-        a = remainder.total_seconds()
-        try:
-            if a < (tick * 60) and a >=-1 and a <=900 and tick !=0:
-                if a <=60:
-                    countdown = str('Boards refresh in {} seconds.'.format(int(a)))
-                elif a >60:
-                    countdown = str('Boards refresh in {} minutes.'.format(int(a / 60) +1))
-                elif a <=3:
-                    countdown = str('Boards refreshing.')
-            if tick == 0:  # deal with the next day
-                if time.hour == 23:
-                    tick_time = time.replace(day=time.day+1,hour=time.hour - 23, minute=0, second=0)
-                else:
-                    if time.hour+1 > 23:
-                        tick_time = time.replace(day=time.day+1, hour=0, minute=0, second=0)
-                    else:
-                        tick_time = time.replace(hour=time.hour+1, minute=0, second=0)
-                remainder = tick_time - time
-                a = remainder.total_seconds()
-                if a >=-1 and a <=900:
-                    if a <=60:
-                        countdown = str('Boards refresh in {} seconds.'.format(int(a)))
-                    elif a >60:
-                        countdown = str('Boards refresh in {} minutes.'.format(int(a / 60) +1))
-                    elif a <=3:
-                        countdown = str('Boards refreshing.')
-        except Exception as e:
-            log.exception('Exception occured determining time. Values - tick: {} tick_time: {} remainder: {} a: {}'.format(tick, tick_time, remainder, a))
-            pass
-    if 'countdown' not in locals():
-        countdown = str('Time is hard, you don\'t even know.')  #If things are working you shouldn't see this
+    if minutes > 1:
+        countdown = 'Boards refresh in {} minutes.'.format(minutes)
+    if minutes == 1:
+        countdown = 'Boards refresh in {} minute, {} seconds.'.format(minutes, seconds)
+    elif minutes < 1:
+        countdown = 'Boards refresh in {} seconds.'.format(seconds)
+
     # if time string has changed, update it
     board_countdown.config(text=countdown)
     board_countdown.after(300, tick_board)
 
 
 # influence tick countdown timer for main window
-def tick_server():
-    server_time = dt.datetime.utcnow()
-    server_tick_start = server_time.replace(hour=12, minute=0, second=0)
-    server_tick_end = server_time.replace(hour=13, minute=0, second=0)
-
-    # if influence has already been updated for the day
-    if server_time > server_tick_end:
-        ##print('next tick won\'t be until tomorrow') ##DEBUG
-        server_tick_time = server_time.replace(day=server_time.day +1, hour=12, minute=0)
-        server_upcoming_tick_delta = server_tick_time - server_time
-    elif server_time < server_tick_start:
-        ##print('next tick is today') ##DEBUG
-        server_upcoming_tick_delta = server_tick_start - server_time
-    elif server_tick_start < server_time and server_time < server_tick_end: #influence updating now
-        ##print('updating now') ##DEBUG
-        server_upcoming_tick_delta = 'Influence is currently being updated.'
-        #REVIEW perhaps check eddb for updates around this time?
+def tick_server(config):
     try:
-        if server_upcoming_tick_delta.seconds >=3600: #more than an hour
-            ##print('by more than an hour') ##DEBUG
-            hours_left = (server_upcoming_tick_delta.seconds / 60) / 60
-            if hours_left >1.2:
-                countdown = str('Influence tick begins in around {} hours.'.format(int((server_upcoming_tick_delta.seconds / 60) / 60)))
-            else:
-                countdown = str('Influence tick begins in around an hour.')
-        elif server_upcoming_tick_delta.seconds >=60 and server_upcoming_tick_delta.seconds <=3599: #less than an hour:
-            countdown = str('Influence tick begins in {0} minutes.'.format(int(server_upcoming_tick_delta.total_seconds() / 60)))
-        elif server_upcoming_tick_delta.seconds <60:
-            countdown = str('Influence tick begins shortly.'.format(int(server_upcoming_tick_delta.total_seconds() / 60)))
-    except Exception as e:
-        try:
-            countdown = server_upcoming_tick_delta
-        except Exception as e:
-            log.exception('Encountered exception determine influence tick.')
-        pass
+        """ Update clocks and countdowns """
+        utc = dt.datetime.utcnow()
+        influence_processing_start = utc.replace(
+            hour=dt.datetime.strptime(config['General']['inf_tick_start'], '%H:%M').hour,
+            minute=dt.datetime.strptime(config['General']['inf_tick_start'], '%H:%M').minute,
+            second=0)
+        influence_processing_end = utc.replace(
+            hour=dt.datetime.strptime(config['General']['inf_tick_end'], '%H:%M').hour,
+            minute=dt.datetime.strptime(config['General']['inf_tick_start'], '%H:%M').minute,
+            second=0)
 
-    tick_countdown.config(text=countdown)
-    tick_countdown.after(1000, tick_server)
+        if utc > influence_processing_end:  # Influence has already been processed today, calc time until tomorrow
+            try:
+                influence_processing_start = influence_processing_start.replace(day=influence_processing_start.day + 1)
+            except ValueError:
+                influence_processing_start = influence_processing_start.replace(
+                    day=1,
+                    month=influence_processing_start.month + 1
+                )
+        delta = influence_processing_start - utc
+
+        if utc < influence_processing_start:  # Influence window has yet to occur
+            remaining_hours = delta.seconds / 3600
+            if remaining_hours >= 1.2:
+                countdown = 'Influence tick begins in around {} hours.'.format(str(remaining_hours)[0:2])
+            elif remaining_hours < 1.2 and remaining_hours > 1:
+                countdown = 'Influence tick begins in around an hour.'
+            elif remaining_hours < 1 and remaining_hours > 0.5:
+                countdown = 'Influence tick begins in less than an hour.'
+            elif remaining_hours < 0.15:
+                countdown = 'Influence tick begins shortly.'
+        elif utc > influence_processing_start and utc < influence_processing_end:  # Influence is calculating now
+            countdown = 'Influence is currently being calculated.'
+
+    except Exception as e:
+        log.exception('Encountered exception determine influence tick.', e)
+        pass
+    else:
+        tick_countdown.config(text=countdown)
+        tick_countdown.after(1000, lambda c=config: tick_server(c))
 
 
 
