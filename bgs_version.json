@@ -1,4 +1,4 @@
 {
-  "version": "0.92a",
-  "changelog": ["* Fixes hard-coded journal paths"]
+  "version": "0.93a",
+  "changelog": ["* Hopefully fixes clock based CTD"]
 }
