@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 class SettingsWindow(Toplevel):
     """ Create child window: settings """
 
-    def __init__(self, parent, config):
+    def __init__(self, parent):
         logger.debug('Creating settings window.')
 
         # Create TopLevel window
@@ -17,23 +17,24 @@ class SettingsWindow(Toplevel):
 
         # Set Window geom, frame and layout
         self.geometry("+%d+%d" % (parent.winfo_rootx(), parent.winfo_rooty()))
-        self.iconbitmap(config['theme']['icon'])
-        self.title(config['theme']['titles']['settings'])
+        self.iconbitmap(parent.conf['theme']['icon'])
+        self.title(parent.conf['theme']['titles']['settings'])
         self.frame = ttk.Frame(self, padding="10 10 10 10")
         self.frame.grid()
 
         # Initialise variables
+        self.set_status = parent.set_status   # Used to set strings in the main window
         self.option_eddn = BooleanVar()
         self.option_update_check = BooleanVar()
         self.option_ignore_updates = BooleanVar()
         self.option_advisor = BooleanVar()
-        self.my_parent = parent
+        self.conf = parent.conf
 
         # Update variables based on settings.yml
-        self.option_eddn.set(config['settings']['eddn_enabled'])
-        self.option_update_check.set(config['settings']['check_updates_on_start'])
-        self.option_ignore_updates.set(config['settings']['ignoring_updates'])
-        self.option_advisor.set(config['settings']['show_advisor'])
+        self.option_eddn.set(self.conf['settings']['eddn_enabled'])
+        self.option_update_check.set(self.conf['settings']['check_updates_on_start'])
+        self.option_ignore_updates.set(self.conf['settings']['ignoring_updates'])
+        self.option_advisor.set(self.conf['settings']['show_advisor'])
 
         # Window elements
         self.opt1 = Label(self.frame, text='Automatically check for updates on startup',
@@ -65,32 +66,29 @@ class SettingsWindow(Toplevel):
         self.opt_but_frame.grid()
 
         # Add buttons to button frame
-        self.opt_button1 = Button(self.opt_but_frame, padx=20, command=lambda a=config: self.set_options(a),
+        self.opt_button1 = Button(self.opt_but_frame, padx=20, command=lambda: self.set_options(),
                                   text='Change settings')
         self.opt_button1.grid(row=0, column=0, sticky=S)
         self.opt_button2 = Button(self.opt_but_frame, padx=20, command=self.die, text='Cancel')
         self.opt_button2.grid(row=0, column=2, sticky=S)
 
-    def set_options(self, config):
+    def set_options(self):
         logger.info('Saving options...')
         try:
-            config['settings']['eddn_enabled'] = self.option_eddn.get()
-            config['settings']['check_updates_on_start'] = self.option_update_check.get()
-            config['settings']['ignoring_updates'] = self.option_ignore_updates.get()
-            config['settings']['show_advisor'] = self.option_advisor.get()
+            self.conf['settings']['eddn_enabled'] = self.option_eddn.get()
+            self.conf['settings']['check_updates_on_start'] = self.option_update_check.get()
+            self.conf['settings']['ignoring_updates'] = self.option_ignore_updates.get()
+            self.conf['settings']['show_advisor'] = self.option_advisor.get()
 
             with open('settings.yml', 'w') as f:
-                yaml.dump(config['settings'], f)
-                msg = 'Options saved.'
-                logger.info(msg)
-                self.my_parent.set_status(msg)
+                yaml.dump(self.conf['settings'], f)
+                self.set_status('Options saved.')
+                logger.info('Options saved.')
                 self.destroy()
-                return config
 
         except Exception as e:
-            msg = "Could not update settings.yml!"
-            self.my_parent.set_status(msg)
-            logger.exception(msg, e)
+            self.set_status("Could not update settings.yml!")
+            logger.exception("Could not update settings.yml!", e)
             self.destroy()
             pass
 
