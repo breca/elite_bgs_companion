@@ -5,11 +5,10 @@ welcomes:
   - "Good to see you, Commander "
   - "Commander "
   - "Lets get to work, Commander "
-  - "Praise the Signal, it's Commander "
 
 window:
   bgs:
-    no_results: "There's nothing to show! Go earn for the Crew!"
+    no_results: "There's nothing to show!"
 
 
 # Text in credit window
@@ -101,7 +100,6 @@ war_offense_faction_present: " is at war here.\nLets show them not to mess with 
 war_flavour_offence:
   - "Let me hear your battle cry!"
   - "What are you waiting for? Those medals don't earn themselves."
-  - "I want YOU\nfor the RSC Navy!"
   - "If you're not here to win it, you're in the wrong place."
   - "I love the smell of hydrogen fuel in the morning."
   - "Show me your war face!"
@@ -111,7 +109,6 @@ outbreak_defence: " is having an outbreak in this system!\nTrade/Smuggle Medicin
 outbreak_flavour_defence:
   - "*cough*"
   - "*wheeze*"
-  - "Signal protect us."
   - "Could I get a tissue as well?"
   - "Hope you've had your Vitamin C."
   - "Probably get yourself checked while you're here."

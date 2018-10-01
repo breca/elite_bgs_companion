@@ -2,7 +2,7 @@ icon: "images\\favicon.ico"
 logo: "images\\badge.png"
 
 titles:
-  main: "RSC Companion"
+  main: "BGS Companion"
   settings: "Companion Settings"
   credits: "Credits"
   bgs: "BGS Report"
@@ -10,6 +10,6 @@ titles:
   crime: "System Crime Report"
 
 menu:
-  radio: "Hear the Signal"
+  radio: "Listen to Radio"
   affiliate: "Buy Skins"
   donate: "Donate to RSC"
