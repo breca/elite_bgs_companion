@@ -1,12 +1,33 @@
-# Faction disposition
+##
+## Faction disposition
+##
+# Set your friendly / allied / enemies here.
+# Mainly used for advisor text.
 my_faction: Radio Sidewinder Crew
 allied_factions:
   - Radio Sidewinder Galactic
 enemy_factions:
   - Poo Poo Crew
-#
-# BGS report formatting
-#
+
+
+##
+## Trade Thresholds
+##
+# Trades above this number will be counted as a high value trade
+high_trade: 700
+
+
+##
+## Tick time
+##
+# Time (in UTC 24h time) that the influence tick occurs (according to this weeks tea reading)
+# Accepted format: 'HH:MM'   - Don't forget the quotes.
+inf_tick_start: '17:15'
+inf_tick_end: '17:45'
+
+##
+## BGS report formatting
+##
 # Here you can configure how your report string is formatted when it gets copied to the clipboard.
 # The default is...
 # $value > $type > $faction > $station > $system
@@ -15,52 +36,70 @@ enemy_factions:
 # NOTE: If you want to use a literal '$' in your string, use '$$' instead.
 bgs_string: $value > $type > $faction > $station > $system
 
-# "Types" allows you to change how the transaction types are presented.
+# The "Types" below allows you to change how the transaction $type is presented.
 # Each list/array element is appended to the first entry
-# At least one line must be present
-#
-# For example, if you wanted to make this less verbose, you could remove the
-# '$transactions' line.
-#
-# TODO list valid types
+# Note that only 'legal' commander kills will appear under bounties, etc. The rest are captured
+# in the system crime report.
 
 types:
   bounty:
-    start_field: 'Bounties: $amount'
-    kills: ' ($kills kills),'
-    transaction_count: ' $transactions transactions'
-    cmdr_report: '[CMDRs: $cmdr_count $cmdr_names]'  # Will only appear if CMDRs kills were scored
+    start_field: 'Bounties: $amount '
+    kills: '($kills kills)'
+    transaction_count: '$transactions transactions '
+    cmdr_report_start: '[CMDRs: $cmdr_killcount kills - '
+    cmdr_report_entry: '$cmdr_name:$cmdr_individualcount, '
+    cmdr_report_end: ']'
     end_field:
 
   combat_bonds:
-    start_field: 'Combat Bonds: $amount'
-    kills: ' ($kills kills),'
-    transaction_count: ' $transactions transactions'
+    start_field: 'Combat Bonds: $amount '
+    kills: '($kills kills), '
+    transaction_count: '$transactions transactions '
+    cmdr_report_start: '[CMDRs: $cmdr_killcount '
+    cmdr_report_entry: '$cmdr_name:$cmdr_individualcount, '
+    cmdr_report_end: ']'
     end_field:
 
+  # Crime reporting lines only appear if there is something to report
   crime:
-    start_field: 'Fines accrued: $amount'
-    kills: ' ($kills kills),'
-    cmdr_report: '[CMDRs: $cmdr_count $cmdr_names]'  # Will only appear if CMDRs kills were scored
-    assaults: ' ($assault assaults),'
-    misc: ' ($misc other crimes)'
-    end_field:
-
-  donations:
-    start_field: 'Donations: $amount in '
-    transaction_count: ' $transactions transactions'
+    start_field:
+    fines: 'Fines accrued: $amount '
+    assaults_start: 'Assaults: '
+    assault_line: '$faction: $assault_count '
+    assaults_end: 'Assaults: '
+    murders_start: 'NPCs destroyed: '
+    murder_line: ' $faction - $count,'   # Gets appended to the murders line for each faction
+    murders_end:
+    cmdr_report_start: '[CMDRs: $cmdr_killcount '
+    cmdr_report_entry: '$cmdr_name:$cmdr_individualcount, '
+    cmdr_report_end: ']'
+    misc: '($misc other crimes) '
     end_field:
 
   mission:
     start_field: 'Missions: $amount ('
     completed:
-      high: ' $m_high high '
-      med: ' $m_high high '
-      low: ' $m_low low '
-    abandoned: ' $m_dumped dropped '
+      high: ' $m_high high,'
+      med: ' $m_med med,'
+      low: ' $m_low low,'
+    abandoned: ' $m_dumped abandoned.'
     end_field: ')'
 
   exploration:
     start_field: 'Exploration: $amount in '
     transaction_count: ' $transactions transactions'
     end_field:
+
+  smuggling:
+    start_field: 'Smuggling: $amount ('
+    high: ' $high high profit trades [$commodity_types], '
+    normal: ' %norm profitable trades [$commodity_types], '
+    loss: ' $loss deficit trades [$commodity_types] '
+    end_field: ')'
+
+  trading:
+    start_field: 'Trade: $amount ('
+    high: ' $high high profit trades [$commodity_types], '
+    normal: ' %normal profitable trades [$commodity_types], '
+    loss: ' $loss deficit trades [$commodity_types] '
+    end_field: ')'
