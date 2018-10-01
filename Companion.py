@@ -1,10 +1,6 @@
 import logging.config
 import yaml
-import queue
 from windows.main import MainWindow
-from lib.debased import Debaser
-from tkinter import *
-from tkinter import ttk
 
 
 '''
@@ -70,26 +66,8 @@ if __name__ == '__main__':
     config = load_configurations()
     logging.info('Configuration loaded.')
 
-    # logging.debug('Creating queues.')
-    # q_main = queue.Queue()    # Main window queue
-    # q_data = queue.Queue()    # Data handler queue
-    # q_db = queue.Queue()      # Database query queue
-
     # Main window initialisation
-    root = MainWindow(config)#, q_main, q_db)
-
-
-    # # Data broker initialisation
-    # data_broker = DataHandler(q_main, q_db)
-    #
-    # # Database initialisation
-    # database = Debased(q.db)
-
-    # Start monitoring queues
-    #logging.debug('Monitoring queue.')
-    #app.monitor_queue()
-
-    #queue_main.put({'type': 'name', 'value': 'ftoopmsh'})
+    root = MainWindow(config)
 
     # Enter main loop
     root.mainloop()
