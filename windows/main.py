@@ -14,13 +14,12 @@ logger = logging.getLogger(__name__)
 class MainWindow(Tk):
     """ Create main window """
 
-    def __init__(self, config): #, q_main, q_db):
+    def __init__(self, config):
         logging.debug('Creating main window.')
         self.conf = config
 
         # Create window
         Tk.__init__(self)
-
         self.title(self.conf['theme']['titles']['main'])
         self.geometry("610x340")
         self.iconbitmap(self.conf['theme']['icon'])
@@ -28,10 +27,6 @@ class MainWindow(Tk):
         self.rowconfigure(13, pad=10)
         self.columnconfigure(2, weight=5)
         self.protocol("WM_DELETE_WINDOW", self.shutdown)
-
-        # self.queue = queue.Queue()
-        # self.queue = q_main
-        # self.q_db = q_db
 
         # Custom variables
         self.commander_name = StringVar()
@@ -48,7 +43,7 @@ class MainWindow(Tk):
         self.clock_server = StringVar()
         self.countdown_board = StringVar()
         self.countdown_influence = StringVar()
-        self.session_stats = StringVar()
+        # self.session_stats = StringVar()
 
         if not self.commander_name.get():
             logging.debug('First run - setting commander name.')
@@ -219,7 +214,7 @@ class MainWindow(Tk):
         self.status_line.set(time + text)
 
     def update_credits(self, amount):
-        """ Method to update credits, returning nice readable strings """
+        """ Method to update displayed credits, returning nice readable strings """
 
         logging.debug('Updating credits.')
         old_total = self.credits_int
@@ -244,7 +239,7 @@ class MainWindow(Tk):
             logging.debug('Received no credits for this transaction.')
 
     def update_location(self, location):
-        """ Log and update the current location """
+        """ Update the displayed current location """
 
         if location != self.location.get():
             logging.debug('Updating location to "{}"'.format(location))
@@ -255,7 +250,7 @@ class MainWindow(Tk):
             logging.debug('Attempted to update location, but was identical to existing record.')
 
     def update_shipname(self, name):
-        """ Log and update the current ship name """
+        """ Update the displayed ship name """
 
         if name != self.ship_name.get():
             logging.debug('Updating ship name to "{}"'.format(name))
@@ -266,7 +261,7 @@ class MainWindow(Tk):
             logging.debug('Attempted to update ship name, but was identical to existing record.')
 
     def update_commander(self, name):
-        """ Log and update the current commander name """
+        """ Update the displayed commander name """
 
         if name != self.commander_name.get():
             logging.debug('Updating commander\'s name to "{}"'.format(name))
@@ -277,7 +272,7 @@ class MainWindow(Tk):
             logging.debug('Attempted to update the commander\'s name, but was identical to existing record.')
 
     def update_game_mode(self, mode):
-        """ Log and update changes to the game mode """
+        """ Update the displayed game mode """
 
         if mode != self.game_mode.get():
             logging.debug('Updating game mode to "{}"'.format(mode))
@@ -320,7 +315,9 @@ class MainWindow(Tk):
 
             if utc > influence_processing_end:  # Influence has already been processed today, calc time until tomorrow
                 try:
-                    influence_processing_start = influence_processing_start.replace(day=influence_processing_start.day + 1)
+                    influence_processing_start = influence_processing_start.replace(
+                        day=influence_processing_start.day + 1
+                    )
                 except ValueError:
                     influence_processing_start = influence_processing_start.replace(
                         day=1,
@@ -333,7 +330,9 @@ class MainWindow(Tk):
             if utc < influence_processing_start: # Influence window has yet to occur
                 remaining_hours = delta.seconds / 3600
                 if remaining_hours >= 1.2:
-                    self.countdown_influence.set('Influence tick begins in around {} hours.'.format(str(remaining_hours)[0:2]))
+                    self.countdown_influence.set('Influence tick begins in around {} hours.'.format(
+                        str(remaining_hours)[0:2])
+                    )
                 elif remaining_hours < 1.2 and remaining_hours > 1:
                     self.countdown_influence.set('Influence tick begins in around an hour.')
                 elif remaining_hours < 1 and remaining_hours > 0.5:
@@ -384,6 +383,7 @@ class MainWindow(Tk):
             self.countdown_board.set('Time until board refresh unknown.')
 
         self.after(1000, self.update_clock_times)
+
 
     # def monitor_queue(self):
     #     """
