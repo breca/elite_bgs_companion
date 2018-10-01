@@ -6,6 +6,8 @@ titles:
   settings: "Companion Settings"
   credits: "Credits"
   bgs: "BGS Report"
+  timezone: "Timezones"
+  crime: "System Crime Report"
 
 menu:
   radio: "Hear the Signal"
