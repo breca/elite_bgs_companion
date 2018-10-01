@@ -4,7 +4,7 @@
 
 ![Carte Blanc Edition](https://i.imgur.com/cpI2vzF.png)
 
-## Current Version: 0.93a (Development)
+## Current Version: 0.94a (Development)
 
 This application parses the player's journal file and extracts
 information that pertains to the Elite Dangerous background simulation.
