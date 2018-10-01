@@ -84,26 +84,41 @@ bgs = {
                     'Radio Sidewinder Crew': {          # Faction
                         'state': 'N/A',                 # Faction State (Boom, etc)
                         'transactions': {
+                            'combat': {
+                                'count': 2,          # Total combat bond transactions
+                                'kills': 23,         # Total warzone kills
+                                'amount': 5000,      # Total combat bond credits rewarded
+                                'commanders': 2,     # Number of commander bounties collected
+                                'cmdr_names': { 'name': 4 }     # Commander names and times killed
+                                },
                             'bounty': {
                                 'count': 2,          # Total bounty transactions
                                 'kills': 23,         # Total bounty kills
                                 'amount': 5000,      # Total bounty credits rewarded
                                 'commanders': 2,     # Number of commander bounties collected
-                                'cmdr_names': []     # Commander names
+                                'cmdr_names': { 'name': 4 }     # Commander names and times killed
                                 },
                             'trade': {
                                 'count': {            # Number of trades made
                                    'high': 12,        # Trade transaction with high profit (>700 credits)
-                                   'low': 2,          # Trade transaction with low profit (<700 credits)
-                                   'loss': 231        # Trade transaction at a loss (<700 credits)
+                                   'high_commtypes': [], # List of commodity types traded at this level
+                                   'normal': 2,          # Trade transaction with normal profit (<700 credits)
+                                   'normal_commtypes': [], # List of commodity types traded at this level
+                                   'loss': 231        # Trade transaction at a loss (<0 credits)
+                                   'loss_commtypes': [] # List of commodity types traded at this level
+
                                    }
                                 'amount': 12313,      # Credits made/lost trading
                                 },
                             'smuggled': {
-                                'count': {            # Smuggling follows similar pattern
-                                    'high': 12,
-                                    'low': 2
-                                    }
+                                'count': {            # Number of trades made
+                                   'high': 12,        # Trade transaction with high profit (>700 credits)
+                                   'high_commtypes': [], # List of commodity types traded at this level
+                                   'normal': 2,          # Trade transaction with normal profit (<700 credits)
+                                   'normal_commtypes': [], # List of commodity types traded at this level
+                                   'loss': 231        # Trade transaction at a loss (<0 credits)
+                                   'loss_commtypes': [] # List of commodity types traded at this level
+                                   }
                                 'amount': 12321
                                 },
                             'mission': {                # FDev still haven't given us proper identifiers for this...
@@ -114,11 +129,11 @@ bgs = {
                                    }
                                 'abandoned': 4,      # Missions abandoned
                                 'amount': 12342,    # Amount raised waiting for a decent mission system
-                                'uid': ['123123123', '54353445324'] # Used to ensure no doubling of mission data
+                                'id': ['123123123', '54353445324'] # Used to ensure no doubling of mission data
                                 },
                             'exploration: { 
                                 'count': 123,   # Individual exploration transactions
-                                'exploration_amount': 10    # Amount raised from selling exploration data
+                                'amount': 10    # Amount raised from selling exploration data
                             }
                         }
                     },
