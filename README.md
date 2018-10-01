@@ -74,7 +74,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ## Changelog:
 
- * Version 0.93a
+ * Version 0.94a
 
     BGS Report / Timezone window now updates dynamically.
     
@@ -87,6 +87,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     Changed database schema and access methods to hopefully suck less.
    
     Wings can now customise application strings / menus / windows / output easier.
+ 
+ 
+ * Version 0.93a
+
+    Hopefully fixes clock based CTD
+
+ * Version 0.92a
+
+    Fixes hard-coded journal links.
  
  * Version 0.92a
  
