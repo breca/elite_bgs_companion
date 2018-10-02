@@ -84,6 +84,7 @@ class SettingsWindow(Toplevel):
                 yaml.dump(self.conf['settings'], f)
                 self.set_status('Options saved.')
                 logger.info('Options saved.')
+                logger.debug('Options: {}'.format(str(self.conf['settings'])))
                 self.destroy()
 
         except Exception as e:
