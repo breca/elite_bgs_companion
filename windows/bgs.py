@@ -45,7 +45,6 @@ class BgsWindow(Toplevel):
         self.prefetch_window = self.canvas.create_window((4, 4), window=self.canvas_frame, anchor="nw")
 
         if not hasattr(self, 'prefetch_textfield'):
-            print('STUB')
             self.prefetch_textfield = StringVar()
             self.prefetch_textfield.set('Loading, please wait.')
 
