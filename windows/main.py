@@ -6,6 +6,8 @@ from . import settings
 from . import bgs
 from . import timezone
 from . import crime
+from lib import debased
+from lib import monitor
 
 import logging
 logger = logging.getLogger(__name__)
@@ -45,9 +47,24 @@ class MainWindow(Tk):
         self.countdown_influence = StringVar()
         # self.session_stats = StringVar()
 
+        # Establish DB, try to update strings from old data
+        self.db = debased.Debaser()
+
         if not self.commander_name.get():
-            logging.debug('First run - setting commander name.')
-            self.commander_name.set('Loading, please wait.')
+            logging.debug('Trying to load session data.')
+            session = self.db.get_session()
+            logging.debug('Setting strings to previous session data.')
+            self.update_commander(session['commander_name'])
+            self.update_shipname(session['ship_name'], session['ship'])
+            self.credits.set(session['credits'])
+            self.credits_int = session['credits_int']
+            self.credits_delta.set('$0')
+            self.update_game_mode(session['game_mode'], session['game_mode_group'])
+            self.update_location(session['location'])
+            self.set_status('Session data loaded.')
+
+        self.monitor = monitor.JournalMonitor(self)
+        self.monitor.start()
 
         # Menu bar configuration
         self.menu_bar = Menu(self)
@@ -203,6 +220,10 @@ class MainWindow(Tk):
 
     def shutdown(self):
         logging.info('Shutting down.')
+        print(str(self.db.get_session()))
+        self.monitor.stop()
+        self.monitor.join()
+        self.db.close()
         self.destroy()
 
     def set_status(self, text):
@@ -233,8 +254,13 @@ class MainWindow(Tk):
                 ))
             # Format the credit strings nicely
             logging.debug('Updating credits.')
-            self.credits.set(str('${:,}'.format(self.credits_int)))
-            self.credits_delta.set(str('${:,}'.format(self.credits_delta_int)))
+            nice_credits = str('${:,}'.format(self.credits_int))
+            nice_delta = str('${:,}'.format(self.credits_delta_int))
+            self.credits.set(nice_credits)
+            self.credits_delta.set(nice_delta)
+            logging.debug('Credits stored.')
+            session = {'credits': nice_credits, 'credits_int': amount}
+            self.db.update_session(session)
         else:
             logging.debug('Received no credits for this transaction.')
 
@@ -246,17 +272,27 @@ class MainWindow(Tk):
             logging.debug('Previous location: "{}"'.format(self.location.get()))
             self.location.set(location)
             logging.debug('Location set.')
+            session = {'location': location }
+            self.db.update_session(session)
+            logging.debug('Location stored.')
+
         else:
             logging.debug('Attempted to update location, but was identical to existing record.')
 
-    def update_shipname(self, name):
+    def update_shipname(self, name, ship):
         """ Update the displayed ship name """
+
+        if len(ship) > 0:
+            name = '{} [{}]'.format(name, ship)
 
         if name != self.ship_name.get():
             logging.debug('Updating ship name to "{}"'.format(name))
             logging.debug('Previous ship name: "{}"'.format(self.ship_name.get()))
             self.ship_name.set(name)
             logging.debug('Ship name set.')
+            session = {'ship_name': name, 'ship': ship}
+            self.db.update_session(session)
+            logging.debug('Ship name and type stored.')
         else:
             logging.debug('Attempted to update ship name, but was identical to existing record.')
 
@@ -268,17 +304,27 @@ class MainWindow(Tk):
             logging.debug('Previous commander\'s name: "{}"'.format(self.commander_name.get()))
             self.commander_name.set(name)
             logging.debug('Commander\'s name set.')
+            session = {'commander_name': name}
+            self.db.update_session(session)
+            logging.debug('Commander\'s name stored.')
         else:
             logging.debug('Attempted to update the commander\'s name, but was identical to existing record.')
 
-    def update_game_mode(self, mode):
+    def update_game_mode(self, mode, *group):
         """ Update the displayed game mode """
 
+        if 'group' in locals():
+            if len(group) > 1:
+                mode = '{} ({})'.format(mode, group)
         if mode != self.game_mode.get():
             logging.debug('Updating game mode to "{}"'.format(mode))
             logging.debug('Previous game mode: "{}"'.format(self.game_mode.get()))
-            self.commander_name.set(mode)
+            self.game_mode.set(mode)
             logging.debug('Game mode set.')
+            session = {'game_mode': mode,
+                                   'group': group}
+            self.db.update_session(session)
+            logging.debug('Game mode stored.')
         else:
             logging.debug('Attempted to update the game mode, but was identical to existing record.')
 
