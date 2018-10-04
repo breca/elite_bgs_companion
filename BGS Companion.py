@@ -94,6 +94,10 @@ def main():
     runtime['target_faction'] = config['General']['AdvisorFaction']
     runtime['log_level'] =  config['General']['LogLevel']
 
+    if config['General']['override_journal_location']:
+        log.info('Overriding default journal location with "{}"'.format(config['General']['override_journal_location']))
+        runtime['journal_path'] = config['General']['override_journal_location']
+
     log.info('Started.')
 
     '''###########################################
@@ -881,6 +885,10 @@ class JournalMonitor(threading.Thread):
                         self.journal_file = open(newest, 'r')
                         log.debug('JournalMonitor moving to previous offset.')
                         self.journal_file.seek(self.journal_byte_offset)
+            except ValueError:
+                msg = 'Could not find journal files at "{}".'.format(runtime['journal_path'])
+                log.error(msg)
+                self.msgqueue.put(msg)
             except Exception as e:
                 log.exception('JournalMonitor hit exception checking for file.', e)
 
