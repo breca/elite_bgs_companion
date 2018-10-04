@@ -76,6 +76,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	NOTE This branch is horrible and on life support. If you want to
 	contribute, please use the development branch.
 
+ * Version 0.94a
+ 
+	Workaround to allows users to override path to their journals in settings.ini
+	(i.e override_journal_location = Z:\Somewhere\Saved Games\Frontier Developments\Elite Dangerous)
+
  * Version 0.93a
  
 	Hopefully fixes clock based CTD
