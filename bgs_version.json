@@ -1,4 +1,4 @@
 {
-  "version": "0.93a",
-  "changelog": ["* Hopefully fixes clock based CTD"]
+  "version": "0.94a",
+  "changelog": ["* Workaround for users still having issues with non-standard journal locations"]
 }
