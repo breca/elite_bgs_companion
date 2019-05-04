@@ -1,3 +1,5 @@
+# Abandonware: New maintainers welcomed
+
 # BGS Companion for Elite: Dangerous
 
 ![Example Build](https://i.imgur.com/vSCppvA.png)
